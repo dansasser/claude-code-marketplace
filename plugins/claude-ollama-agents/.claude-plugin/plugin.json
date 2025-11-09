@@ -1,0 +1,33 @@
+{
+  "name": "claude-ollama-agents",
+  "version": "1.0.0",
+  "description": "Intelligent multi-agent system for delegating analysis, code review, and complex reasoning tasks to local ollama models. Saves 70%+ of Claude's context budget with automatic model selection and parallel processing.",
+  "author": {
+    "name": "Daniel T Sasser II",
+    "email": "contact@dansasser.me",
+    "url": "https://github.com/dansasser"
+  },
+  "homepage": "https://github.com/dansasser/claude-ollama-agents",
+  "repository": "https://github.com/dansasser/claude-ollama-agents",
+  "license": "MIT",
+  "keywords": [
+    "ollama",
+    "agents",
+    "analysis",
+    "code-review",
+    "multi-model",
+    "context-efficiency",
+    "parallel-processing",
+    "security-analysis",
+    "architecture-analysis"
+  ],
+  "category": "productivity",
+  "tags": [
+    "ollama",
+    "ai-agents",
+    "code-analysis",
+    "developer-tools"
+  ],
+  "commands": "./commands/",
+  "agents": "./agents/"
+}

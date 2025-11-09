@@ -1,0 +1,24 @@
+{
+  "name": "dansasser-marketplace",
+  "owner": {
+    "name": "Daniel T Sasser II",
+    "email": "contact@dansasser.me",
+    "url": "https://github.com/dansasser"
+  },
+  "description": "Claude Code plugins for ollama integration and AI-assisted development",
+  "plugins": [
+    {
+      "name": "claude-ollama-agents",
+      "source": "./plugins/claude-ollama-agents",
+      "description": "Intelligent multi-agent system for delegating analysis, code review, and complex reasoning tasks to local ollama models. Saves 70%+ of Claude's context budget with automatic model selection and parallel processing.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Daniel T Sasser II",
+        "email": "contact@dansasser.me",
+        "url": "https://github.com/dansasser"
+      },
+      "keywords": ["ollama", "agents", "analysis", "code-review", "multi-model", "context-efficiency"],
+      "category": "productivity"
+    }
+  ]
+}
