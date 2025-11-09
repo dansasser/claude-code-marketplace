@@ -20,14 +20,5 @@
     "parallel-processing",
     "security-analysis",
     "architecture-analysis"
-  ],
-  "category": "productivity",
-  "tags": [
-    "ollama",
-    "ai-agents",
-    "code-analysis",
-    "developer-tools"
-  ],
-  "commands": "./commands/",
-  "agents": "./agents/"
+  ]
 }
