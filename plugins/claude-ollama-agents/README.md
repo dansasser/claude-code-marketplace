@@ -81,18 +81,18 @@ The installer will:
 
 ## Slash Commands
 
-### /analyze
+### /claude-ollama-agents:analyze
 
 Analyze files with automatic model and strategy selection.
 
 ```bash
 # General analysis
-/analyze src/auth.py
+/claude-ollama-agents:analyze src/auth.py
 
 # Focused analysis
-/analyze implementation-plan.md security
-/analyze README.md architecture
-/analyze api.py performance
+/claude-ollama-agents:analyze implementation-plan.md security
+/claude-ollama-agents:analyze README.md architecture
+/claude-ollama-agents:analyze api.py performance
 ```
 
 **Focus Areas:**
@@ -102,19 +102,19 @@ Analyze files with automatic model and strategy selection.
 - `quality`: Code quality, best practices
 - `general`: Comprehensive overview
 
-### /review
+### /claude-ollama-agents:review
 
 Comprehensive code review with multiple strictness levels.
 
 ```bash
 # Standard review
-/review src/auth.py
+/claude-ollama-agents:review src/auth.py
 
 # Quick review (major issues only)
-/review main.py quick
+/claude-ollama-agents:review main.py quick
 
 # Thorough review (multi-perspective)
-/review src/api/ thorough
+/claude-ollama-agents:review src/api/ thorough
 ```
 
 **Strictness Levels:**
@@ -130,19 +130,19 @@ Comprehensive code review with multiple strictness levels.
 - Best practice violations
 - Test coverage
 
-### /architect
+### /claude-ollama-agents:architect
 
 Architecture analysis and design pattern evaluation.
 
 ```bash
 # Full architecture analysis
-/architect src/
+/claude-ollama-agents:architect src/
 
 # Specific aspects
-/architect docs/architecture.md patterns
-/architect src/api/ scalability
-/architect system/ security
-/architect src/ dependencies
+/claude-ollama-agents:architect docs/architecture.md patterns
+/claude-ollama-agents:architect src/api/ scalability
+/claude-ollama-agents:architect system/ security
+/claude-ollama-agents:architect src/ dependencies
 ```
 
 **Aspects:**
@@ -152,22 +152,22 @@ Architecture analysis and design pattern evaluation.
 - `dependencies`: Dependency graph and coupling
 - `all`: Comprehensive architecture review (default)
 
-### /models
+### /claude-ollama-agents:models
 
 Manage ollama model registry.
 
 ```bash
 # Discover new models
-/models discover
+/claude-ollama-agents:models discover
 
 # List all models
-/models list
+/claude-ollama-agents:models list
 
 # Check specific model
-/models check kimi-k2-thinking:cloud
+/claude-ollama-agents:models check kimi-k2-thinking:cloud
 
 # Show defaults
-/models defaults
+/claude-ollama-agents:models defaults
 ```
 
 **Actions:**
@@ -176,17 +176,17 @@ Manage ollama model registry.
 - `check <model>`: Verify model availability
 - `defaults`: Show default model selections
 
-### /deep-analyze
+### /claude-ollama-agents:deep-analyze
 
 Multi-perspective deep analysis using parallel orchestrator.
 
 ```bash
 # Auto-select perspectives
-/deep-analyze implementation-plan.md
+/claude-ollama-agents:deep-analyze implementation-plan.md
 
 # Specific perspectives
-/deep-analyze src/auth.py security,testing
-/deep-analyze architecture.md architecture,scalability
+/claude-ollama-agents:deep-analyze src/auth.py security,testing
+/claude-ollama-agents:deep-analyze architecture.md architecture,scalability
 ```
 
 **Perspectives:**
@@ -330,46 +330,46 @@ ollama pull your-model
 
 ```bash
 # Review authentication module for security issues
-/review src/auth/login.py standard
+/claude-ollama-agents:review src/auth/login.py standard
 
 # Deep security analysis
-/deep-analyze src/auth/ security,testing
+/claude-ollama-agents:deep-analyze src/auth/ security,testing
 ```
 
 ### Example 2: Architecture Analysis
 
 ```bash
 # Analyze overall architecture
-/architect src/ all
+/claude-ollama-agents:architect src/ all
 
 # Focus on scalability
-/architect src/api/ scalability
+/claude-ollama-agents:architect src/api/ scalability
 
 # Check design patterns
-/architect docs/architecture.md patterns
+/claude-ollama-agents:architect docs/architecture.md patterns
 ```
 
 ### Example 3: Implementation Review
 
 ```bash
 # Quick check before commit
-/review src/feature.py quick
+/claude-ollama-agents:review src/feature.py quick
 
 # Thorough review before PR
-/review src/feature.py thorough
+/claude-ollama-agents:review src/feature.py thorough
 
 # Analyze specific concern
-/analyze src/feature.py performance
+/claude-ollama-agents:analyze src/feature.py performance
 ```
 
 ### Example 4: Large File Analysis
 
 ```bash
 # Automatically chunks if needed
-/analyze docs/implementation-plan.md
+/claude-ollama-agents:analyze docs/implementation-plan.md
 
 # Deep analysis with multiple perspectives
-/deep-analyze docs/design.md architecture,security,implementation
+/claude-ollama-agents:deep-analyze docs/design.md architecture,security,implementation
 ```
 
 ## Troubleshooting
@@ -378,13 +378,13 @@ ollama pull your-model
 
 ```bash
 # Check if model is available
-/models check kimi-k2-thinking:cloud
+/claude-ollama-agents:models check kimi-k2-thinking:cloud
 
 # If not, pull it
 ollama pull kimi-k2-thinking:cloud
 
 # Rediscover models
-/models discover
+/claude-ollama-agents:models discover
 ```
 
 ### Path Errors (Windows)
