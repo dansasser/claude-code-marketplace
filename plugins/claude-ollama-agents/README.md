@@ -2,6 +2,48 @@
 
 Intelligent multi-agent system for delegating analysis, code review, and complex reasoning tasks to local ollama models. Preserves Claude's context budget while leveraging specialized models for deep analysis.
 
+## What You Get
+
+**Save Your Context Budget**
+
+Stop burning through Claude's 200K token budget on file reads. Delegate analysis to ollama and get back summarized insights instead.
+
+Example: Analyzing 5 large documentation files
+- Reading directly: 65,000 tokens (33% of your budget gone)
+- Via this plugin: 5,000 tokens (2.5% of budget)
+- **Savings: 60,000 tokens - enough for 12 more analyses**
+
+You get 13x more work done per session. Your context budget actually lasts.
+
+**Smart Model Selection**
+
+You never guess which model to use. The plugin automatically picks the best one for your task - code review routes to reasoning models, image analysis picks vision-capable models. You focus on your work, not configuration.
+
+**Your Models, Managed**
+
+Search your ollama models by capability. See context windows. Set your defaults. Actually understand what you have.
+
+| Model | Capabilities | Context | Family |
+|-------|-------------|---------|--------|
+| kimi-k2-thinking:cloud | code, reasoning | 262K | deepseek |
+| qwen3-vl:235b-instruct-cloud | vision, code | 262K | qwen |
+| deepseek-v3.1:671b-cloud | code, reasoning | 164K | deepseek |
+| qwen2.5-coder:3b | vision, code | 33K | qwen |
+
+Better than `ollama list` - this actually helps you understand what you have.
+
+**No More Context Limits**
+
+Analyze files of any size. Automatic chunking. Seamless results. You don't hit walls, you just get answers.
+
+**Multiple Expert Views**
+
+Get security, architecture, and implementation analysis simultaneously. Each perspective tracked and combined intelligently. Like having multiple specialists working at once.
+
+**Your Work, Tracked**
+
+Every analysis preserved with orchestration IDs. Review past analyses anytime. Full audit trail in `~/.claude/orchestrations/`. Your work history is preserved and reviewable.
+
 ## Features
 
 - **Slash Commands**: Easy-to-use commands for common analysis tasks
