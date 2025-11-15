@@ -11,7 +11,7 @@
       "name": "ollama-agents",
       "source": "./plugins/claude-ollama-agents",
       "description": "Intelligent multi-agent system for delegating analysis, code review, and complex reasoning tasks to local ollama models. Saves 70%+ of Claude's context budget with automatic model selection and parallel processing.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "Daniel T Sasser II",
         "email": "contact@dansasser.me",
