@@ -51,7 +51,41 @@ Every analysis preserved with orchestration IDs. Review past analyses anytime. F
 - **Context Efficiency**: Save 70%+ of Claude's context budget
 - **Parallel Analysis**: Multi-perspective deep analysis with orchestration
 - **Chunked Processing**: Automatic handling of large files
+- **Directory Operations**: Analyze entire directories with `@./dir/:tree` and `@./dir/:search:PATTERN`
 - **Cross-Platform**: Works on Windows, macOS, and Linux
+
+## Directory Operations
+
+Analyze entire directories instead of individual files using ollama-prompt's directory syntax:
+
+| Syntax | Operation | Use Case |
+|--------|-----------|----------|
+| `@./dir/` | List contents | Quick directory overview |
+| `@./dir/:tree` | Tree view | Architecture analysis |
+| `@./dir/:search:PATTERN` | Search | Security audits, finding TODOs |
+
+**Examples:**
+
+```bash
+# Architecture analysis with tree view
+/claude-ollama-agents:architect src/
+# Uses @./src/:tree internally for structure analysis
+
+# Security audit with pattern search
+/claude-ollama-agents:analyze src/ security
+# Uses @./src/:search:eval, @./src/:search:password, etc.
+
+# Code review with issue detection
+/claude-ollama-agents:review src/ thorough
+# Uses @./src/:search:TODO, @./src/:search:FIXME
+```
+
+**Benefits:**
+- **Token Efficient**: `@./src/:tree` uses ~500 tokens vs ~15,000 for 10 individual files
+- **Better Context**: Model sees full structure, not isolated files
+- **Targeted Analysis**: Search operations find specific patterns across entire codebase
+
+**Learn More:** [Directory Operations Guide](docs/directory-operations.md)
 
 ## Installation
 
@@ -318,6 +352,54 @@ Via Agents:
 
 ## Configuration
 
+### Python Detection (Automatic)
+
+**The plugin automatically detects your Python installation on first use.**
+
+No manual configuration needed! The first time you use an agent, it will:
+
+1. Search for Python in common locations
+2. Validate the Python installation
+3. Save the configuration to `~/.claude/agents/config.json`
+4. Reuse this configuration for all future runs
+
+**Auto-detection priority:**
+1. Existing configuration file
+2. Environment variable: `$CLAUDE_PYTHON_PATH`
+3. System `python3` command
+4. Common conda environments (`~/miniconda3/envs/ai/`, etc.)
+5. Interactive prompt if auto-detection fails
+
+**Manual configuration (if needed):**
+
+Set environment variable:
+```bash
+export CLAUDE_PYTHON_PATH=/path/to/python3
+```
+
+Or run detection manually:
+```bash
+~/.claude/plugins/.../scripts/detect-python.sh
+```
+
+**Configuration file location:**
+```
+~/.claude/agents/config.json
+```
+
+**Example configuration:**
+```json
+{
+  "version": "1.0",
+  "python": {
+    "executable": "/c/Users/username/miniconda3/envs/ai/python3",
+    "version": "3.10.19",
+    "auto_detected": true,
+    "verified_at": "2025-11-18T22:24:00.774744"
+  }
+}
+```
+
 ### Model Registry
 
 Location: `~/.claude/model-capabilities.json`
@@ -535,6 +617,14 @@ Issues and questions:
 - Review helper scripts in ~/.claude/scripts/
 
 ## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for full version history.
+
+### v1.1.0 (Unreleased)
+- **Directory Operations**: Support for `@./dir/:tree` and `@./dir/:search:PATTERN`
+- Angle-specific directory operations in parallel orchestrator
+- Enhanced architecture analysis with tree view
+- Security audits with pattern search
 
 ### v1.0.0 (2025-01-09)
 - Initial release

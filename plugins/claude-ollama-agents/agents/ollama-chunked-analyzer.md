@@ -22,6 +22,7 @@ You are a specialized agent that handles large-scale analysis using ollama-promp
 - Multiple file references in analysis request
 - Complex multi-step reviews (architecture, security, implementation plans)
 - Previous ollama-prompt call returned truncated/empty response
+- Large directory analysis that exceeds single-call limits
 
 ## Model Context Windows (Reference)
 
@@ -40,6 +41,130 @@ llama3.1: 128,000 tokens
 - File size in bytes ÷ 4 = estimated tokens
 - Add prompt tokens (~500-1000)
 - If total > 80% of context window → chunk needed
+
+---
+
+## Directory Operations
+
+When analyzing directories, use ollama-prompt's directory syntax for efficient analysis:
+
+### Directory Syntax Reference
+
+| Syntax | Operation | Tokens | Use Case |
+|--------|-----------|--------|----------|
+| `@./dir/` | List contents | ~200 | Quick overview |
+| `@./dir/:tree` | Tree view (depth=3) | ~500 | Architecture analysis |
+| `@./dir/:search:PATTERN` | Search for pattern | ~1,000 | Targeted analysis |
+
+### Directory Chunking Strategy
+
+For large directories, use a **structure-first** approach:
+
+**Step 1: Get Structure Overview**
+```bash
+# Low token cost - shows entire structure
+ollama-prompt --prompt "Analyze the structure of this codebase:
+@./src/:tree
+
+Identify:
+- Key modules and their purposes
+- Layer organization
+- Entry points" --model kimi-k2-thinking:cloud > structure.json
+```
+
+**Step 2: Identify Key Areas from Structure**
+From the tree output, identify which subdirectories need deep analysis.
+
+**Step 3: Deep Dive with Targeted Operations**
+```bash
+# Search for specific patterns
+ollama-prompt --prompt "Security analysis:
+@./src/auth/:search:password
+@./src/api/:search:eval
+
+Analyze each finding." --model kimi-k2-thinking:cloud --session-id $SESSION_ID > security.json
+```
+
+**Step 4: Combine with Individual File Analysis**
+For critical files identified in structure analysis:
+```bash
+ollama-prompt --prompt "Deep review of authentication:
+@./src/auth/login.py
+@./src/auth/session.py
+
+Focus on security vulnerabilities." --model kimi-k2-thinking:cloud --session-id $SESSION_ID > auth_deep.json
+```
+
+### When to Use Directory Operations vs File References
+
+| Scenario | Approach | Example |
+|----------|----------|---------|
+| Understand project structure | `@./dir/:tree` | `@./src/:tree` |
+| Find security patterns | `@./dir/:search:PATTERN` | `@./src/:search:eval` |
+| Find incomplete work | `@./dir/:search:TODO` | `@./src/:search:TODO` |
+| Deep file analysis | Individual `@./file` | `@./src/critical.py` |
+| Multiple related files | Multiple `@./file` refs | `@./src/auth/*.py` |
+
+### Directory Chunking Example
+
+**User Request:** "Review the entire src/ directory for security issues"
+
+**Your Process:**
+
+1. **Phase 1 - Structure Analysis (Chunk 1)**
+```bash
+ollama-prompt --prompt "CONTEXT: Security review Phase 1 - Structure Analysis
+
+Get codebase structure:
+@./src/:tree
+
+Identify:
+- Authentication-related modules
+- API endpoints
+- Data handling modules
+- External integrations
+
+Output: List of high-risk areas to analyze in detail." \
+--model kimi-k2-thinking:cloud > chunk1_structure.json
+
+SESSION_ID=$(jq -r '.session_id' chunk1_structure.json)
+```
+
+2. **Phase 2 - Pattern Search (Chunk 2)**
+```bash
+ollama-prompt --prompt "CONTEXT: Security review Phase 2 - Vulnerability Patterns
+
+Search for dangerous patterns:
+@./src/:search:eval
+@./src/:search:exec
+@./src/:search:password
+@./src/:search:secret
+@./src/:search:sql
+
+For each finding, note file and line for Phase 3 deep analysis." \
+--model kimi-k2-thinking:cloud --session-id $SESSION_ID > chunk2_patterns.json
+```
+
+3. **Phase 3 - Deep Analysis (Chunk 3)**
+```bash
+# Based on findings from Phase 2, analyze specific files
+ollama-prompt --prompt "CONTEXT: Security review Phase 3 - Deep Analysis
+
+Based on previous findings, review these high-risk files:
+@./src/auth/login.py
+@./src/api/user_handler.py
+
+Provide:
+- Vulnerability assessment
+- Severity ratings
+- Remediation recommendations" \
+--model kimi-k2-thinking:cloud --session-id $SESSION_ID > chunk3_deep.json
+```
+
+4. **Synthesize Results**
+Combine all phases into comprehensive security report.
+
+---
 
 ## Workflow
 

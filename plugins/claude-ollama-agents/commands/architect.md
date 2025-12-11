@@ -26,25 +26,58 @@ You are performing architecture analysis by orchestrating ollama agents.
 **Your Process:**
 
 1. **Understand Scope:**
+   - Check if target is file or directory
+   - For directories: Use `@./dir/:tree` as PRIMARY input for architecture analysis
    - Read architecture documentation if available
-   - Identify key components and modules (via Glob/Grep)
    - Map dependencies and relationships
 
-2. **Invoke Appropriate Agent:**
+2. **Directory Operations for Architecture:**
+
+   **Architecture analysis is IDEAL for directory operations:**
+
+   | Aspect | Primary Operation | Purpose |
+   |--------|-------------------|---------|
+   | all | `@./dir/:tree` | Full structure overview |
+   | patterns | `@./dir/:tree` + `@./dir/:search:class` | Structure + class patterns |
+   | scalability | `@./dir/:tree` | Module organization |
+   | security | `@./dir/:tree` + `@./dir/:search:auth` | Security boundaries |
+   | dependencies | `@./dir/:search:import` | Import analysis |
+
+   **Example Architecture Prompt:**
+   ```bash
+   ollama-prompt --prompt "Architecture analysis:
+
+   Project Structure:
+   @./src/:tree
+
+   Import Dependencies:
+   @./src/:search:^import
+   @./src/:search:^from
+
+   Analyze:
+   - Layer separation
+   - Module boundaries
+   - Design patterns
+   - Coupling and cohesion"
+   ```
+
+3. **Invoke Appropriate Agent:**
 
    **Specific Aspect Analysis:**
    Use ollama-task-router agent with focused prompt:
    - Target: $1
    - Aspect: ${2:-all}
+   - For directories: Agent uses `@./dir/:tree` for structure
    - Request specific analysis (patterns, scalability, security, dependencies)
 
    **Comprehensive Analysis (aspect=all):**
    Use ollama-parallel-orchestrator agent:
    - Perspectives: architecture, security, scalability, maintainability
    - Target: $1
+   - Each perspective uses appropriate directory operations
    - Multi-angle deep analysis
 
-3. **Analysis Framework (for agent to apply):**
+4. **Analysis Framework (for agent to apply):**
 
    **Structure:**
    - Separation of Concerns: Are responsibilities clearly separated?
@@ -65,13 +98,13 @@ You are performing architecture analysis by orchestrating ollama agents.
    - YAGNI (You Aren't Gonna Need It)
    - KISS (Keep It Simple)
 
-4. **Your Role:**
+5. **Your Role:**
    - Invoke appropriate agent based on aspect
    - Receive architectural analysis
    - Format findings for user
    - Highlight key insights and recommendations
 
-5. **Report Format:**
+6. **Report Format:**
    ```
    ## Architecture Analysis
 
@@ -97,5 +130,11 @@ You are performing architecture analysis by orchestrating ollama agents.
    - Refactoring suggestions
    - Pattern applications
    ```
+
+**Why Tree View is Essential for Architecture:**
+- Shows complete module hierarchy in ~500 tokens
+- Reveals layer separation (or lack thereof)
+- Exposes coupling through directory structure
+- Identifies module boundaries instantly
 
 **Remember:** Delegate deep architectural analysis to agents. You focus on presenting clear, actionable insights.

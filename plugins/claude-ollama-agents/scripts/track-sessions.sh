@@ -1,7 +1,7 @@
 #!/bin/bash
 # Manage parallel orchestration session registry
 
-REGISTRY_DIR=$(python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'orchestrations')")
+REGISTRY_DIR=$("${PYTHON_PATH:-python3}" -c "from pathlib import Path; print(Path.home() / '.claude' / 'orchestrations')")
 mkdir -p "$REGISTRY_DIR"
 
 command="$1"
@@ -73,7 +73,7 @@ EOF
 )
 
         # Add to registry using Python (more reliable than jq for complex JSON editing)
-        python3 <<PYTHON
+        "${PYTHON_PATH:-python3}" <<PYTHON
 import json
 import sys
 from pathlib import Path
@@ -129,7 +129,7 @@ PYTHON
             exit 1
         fi
 
-        python3 <<PYTHON
+        "${PYTHON_PATH:-python3}" <<PYTHON
 import json
 import sys
 from pathlib import Path
@@ -165,7 +165,7 @@ PYTHON
             exit 1
         fi
 
-        python3 <<PYTHON
+        "${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -183,7 +183,7 @@ PYTHON
         # List all orchestrations
         # Usage: track-sessions.sh list-all
         ls -1 "$REGISTRY_DIR"/*.json 2>/dev/null | while read -r file; do
-            python3 <<PYTHON
+            "${PYTHON_PATH:-python3}" <<PYTHON
 import json
 with open("$file", 'r') as f:
     data = json.load(f)

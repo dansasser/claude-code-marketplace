@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.1.0] - 2025-12-10
 
 ### Added
 - **Directory Operations Support** - Agents now leverage ollama-prompt's directory capabilities
@@ -101,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Summary |
 |---------|------|---------|
-| Unreleased | - | Directory operations support |
+| 1.1.0 | 2025-12-10 | Directory operations support |
 | 1.0.1 | 2025-01-09 | Rename and version update |
 | 1.0.0 | 2025-01-09 | Initial release |
 
@@ -109,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Upgrade Notes
 
-### Upgrading to Directory Operations (Unreleased)
+### Upgrading to Directory Operations (v1.1.0)
 
 **Minimum Requirements:**
 - ollama-prompt v1.1.0 or higher (for directory syntax support)

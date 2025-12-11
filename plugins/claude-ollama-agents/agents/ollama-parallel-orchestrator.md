@@ -33,33 +33,130 @@ You should be invoked when:
 
 ---
 
+## Angle-Specific Directory Operations
+
+Each analysis perspective benefits from different directory operations. Use the optimal operation for each angle:
+
+### Directory Operations by Angle
+
+| Angle | Primary Operation | Secondary Operation | Rationale |
+|-------|-------------------|---------------------|-----------|
+| **Security** | `@./dir/:search:PATTERN` | `@./file` deep dive | Find vulnerability patterns first |
+| **Architecture** | `@./dir/:tree` | `@./dir/:search:import` | Structure overview, then dependencies |
+| **Performance** | `@./dir/:search:PATTERN` | `@./file` profiling | Find loops, queries, I/O patterns |
+| **Code Quality** | `@./dir/:search:TODO` | `@./dir/:tree` | Find issues, then assess organization |
+
+### Angle-Specific Prompts with Directory Operations
+
+**Security Angle:**
+```bash
+ollama-prompt --prompt "PERSPECTIVE: Security
+
+Search for vulnerability patterns:
+@./src/:search:eval
+@./src/:search:exec
+@./src/:search:password
+@./src/:search:secret
+@./src/:search:sql
+
+For each finding:
+1. Assess severity (Critical/High/Medium/Low)
+2. Explain exploitation risk
+3. Provide remediation steps" \
+--model kimi-k2-thinking:cloud
+```
+
+**Architecture Angle:**
+```bash
+ollama-prompt --prompt "PERSPECTIVE: Architecture
+
+Project Structure:
+@./src/:tree
+
+Analyze:
+- Layer separation (presentation, business, data)
+- Module organization and cohesion
+- Design patterns identified
+- Coupling between components
+- Scalability considerations
+
+Import dependencies:
+@./src/:search:^import
+@./src/:search:^from
+
+Assess dependency structure and potential circular dependencies." \
+--model kimi-k2-thinking:cloud
+```
+
+**Performance Angle:**
+```bash
+ollama-prompt --prompt "PERSPECTIVE: Performance
+
+Search for performance patterns:
+@./src/:search:for.*in.*range
+@./src/:search:while.*True
+@./src/:search:\.query\(
+@./src/:search:sleep\(
+
+Identify:
+- Loop inefficiencies
+- Database query patterns (N+1 problems)
+- Blocking operations
+- Resource-intensive operations
+
+Provide optimization recommendations." \
+--model kimi-k2-thinking:cloud
+```
+
+**Code Quality Angle:**
+```bash
+ollama-prompt --prompt "PERSPECTIVE: Code Quality
+
+Project organization:
+@./src/:tree
+
+Find issues:
+@./src/:search:TODO
+@./src/:search:FIXME
+@./src/:search:HACK
+@./src/:search:XXX
+
+Assess:
+- Code organization
+- Incomplete work tracking
+- Documentation gaps
+- Naming conventions
+- Module cohesion
+
+Prioritize issues by impact on maintainability." \
+--model kimi-k2-thinking:cloud
+```
+
+### Token Efficiency by Angle
+
+| Angle | Without Directory Ops | With Directory Ops | Savings |
+|-------|----------------------|-------------------|---------|
+| Security | ~20,000 (read all files) | ~3,000 (targeted search) | 85% |
+| Architecture | ~15,000 (read structure) | ~500 (tree view) | 97% |
+| Performance | ~20,000 (read all files) | ~2,000 (pattern search) | 90% |
+| Code Quality | ~15,000 (read all files) | ~1,500 (TODO search + tree) | 90% |
+
+---
+
 ## Workflow
 
-### Phase 0: Environment Check (Windows Only)
+### Phase 0: Python Environment Setup
 
-**IMPORTANT: If on Windows, verify Python venv is active BEFORE running helper scripts.**
+**The agent automatically configures Python on first use.**
 
-All helper scripts require `python3`. On Windows, this means a virtual environment must be active.
+All helper scripts use the auto-detected Python installation configured in `~/.claude/agents/config.json`. The `$PYTHON_PATH` environment variable is set automatically.
 
-```bash
-# Detect Windows
-if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]] || [[ -n "$WINDIR" ]]; then
-    # Check if python3 is available
-    if ! command -v python3 &> /dev/null; then
-        echo "ERROR: python3 not found (Windows detected)"
-        echo ""
-        echo "Helper scripts require Python 3.x in a virtual environment."
-        echo ""
-        echo "Please activate your Python venv:"
-        echo "  conda activate ai-on"
-        echo ""
-        echo "Or activate whichever venv you use for Python development."
-        echo ""
-        echo "Cannot proceed with orchestration until Python is available."
-        exit 1
-    fi
-fi
-```
+If you encounter Python-related errors:
+1. The plugin will auto-detect Python on first run
+2. If auto-detection fails, you'll be prompted for the Python path
+3. Configuration is saved and reused for all subsequent runs
+
+**No manual activation required** - Python path is configured automatically.
 
 **If script execution fails with python3 errors:**
 

@@ -7,7 +7,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 MODEL="$1"
-REGISTRY_FILE=$(python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'model-capabilities.json')")
+REGISTRY_FILE=$("${PYTHON_PATH:-python3}" -c "from pathlib import Path; print(Path.home() / '.claude' / 'model-capabilities.json')")
 
 # Get model details from ollama
 MODEL_INFO=$(ollama show "$MODEL" 2>/dev/null)
@@ -90,7 +90,7 @@ while IFS= read -r cap; do
 done <<< "$OLLAMA_CAPS"
 
 # Load inference rules from registry
-NAME_PATTERNS=$(python3 <<PYTHON
+NAME_PATTERNS=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -116,7 +116,7 @@ done <<< "$NAME_PATTERNS"
 
 # Check family capabilities
 if [[ -n "$FAMILY" ]]; then
-    FAMILY_CAPS=$(python3 <<PYTHON
+    FAMILY_CAPS=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -151,7 +151,7 @@ fi
 CAPS_JSON=$(printf '"%s",' "${CAPABILITIES[@]}" | tr -d '\r\n' | sed 's/,$//')
 
 # Add model to registry
-python3 <<PYTHON
+"${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from datetime import datetime
 from pathlib import Path

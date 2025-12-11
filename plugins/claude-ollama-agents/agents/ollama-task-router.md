@@ -17,22 +17,18 @@ Decide the optimal execution path:
 3. **Delegate to ollama-chunked-analyzer** (large files, chunking needed)
 4. **Delegate to ollama-parallel-orchestrator** (deep analysis, multiple perspectives needed)
 
-## Environment Check (Windows)
+## Python Environment Setup
 
-**Before using helper scripts, verify python3 is available:**
+**The agent automatically configures Python on first use.**
 
-If on Windows, helper scripts require python3 from a virtual environment:
+All helper scripts use the auto-detected Python installation configured in `~/.claude/agents/config.json`. The `$PYTHON_PATH` environment variable is set automatically.
 
-```bash
-# Quick check
-if [[ -n "$WINDIR" ]] && ! command -v python3 &> /dev/null; then
-    echo "ERROR: python3 not found (Windows detected)"
-    echo "Please activate your Python venv: conda activate ai-on"
-    exit 1
-fi
-```
+If you encounter Python-related errors:
+1. The plugin will auto-detect Python on first run
+2. If auto-detection fails, you'll be prompted for the Python path
+3. Configuration is saved and reused for all subsequent runs
 
-If you get `python3: command not found` errors, stop and tell the user to activate their venv.
+**No manual activation required** - Python path is configured automatically.
 
 ---
 
@@ -95,6 +91,93 @@ ls -lh <path>
 | Multiple files | Varies | Single | Check total size, may need chunked-analyzer |
 
 **Priority:** If request mentions "comprehensive", "deep dive", "all aspects" → Use parallel orchestrator (overrides other routing)
+
+---
+
+## Directory Operations
+
+When the target is a directory, use ollama-prompt's directory syntax for efficient analysis:
+
+### Directory Syntax Reference
+
+| Syntax | Operation | Use Case |
+|--------|-----------|----------|
+| `@./dir/` | List contents | Quick directory overview |
+| `@./dir/:tree` | Tree view (depth=3) | Architecture analysis |
+| `@./dir/:search:PATTERN` | Search for pattern | Security audits, finding TODOs |
+
+### Directory-Aware Routing
+
+**When target is a directory, select the appropriate operation:**
+
+| Analysis Type | Directory Operation | Example |
+|---------------|---------------------|---------|
+| Architecture | `:tree` | `@./src/:tree` |
+| Security audit | `:search:PATTERN` | `@./src/:search:eval` |
+| Code review | `:tree` + `:search:TODO` | Both for structure and issues |
+| Quick overview | `:list` or `@./dir/` | `@./src/` |
+
+### Directory Routing Examples
+
+**Architecture Analysis:**
+```bash
+ollama-prompt --prompt "Analyze the architecture of this codebase:
+
+Project Structure:
+@./src/:tree
+
+Focus on:
+- Layer separation
+- Module organization
+- Design patterns
+- Coupling between components" \
+--model kimi-k2-thinking:cloud
+```
+
+**Security Audit:**
+```bash
+ollama-prompt --prompt "Security audit - find vulnerable patterns:
+
+Dangerous functions:
+@./src/:search:eval
+@./src/:search:exec
+@./src/:search:subprocess
+
+Hardcoded secrets:
+@./src/:search:password
+@./src/:search:api_key
+
+Analyze each finding for severity." \
+--model kimi-k2-thinking:cloud
+```
+
+**Code Review:**
+```bash
+ollama-prompt --prompt "Code review checklist:
+
+Project structure:
+@./src/:tree
+
+Find issues:
+@./src/:search:TODO
+@./src/:search:FIXME
+@./src/:search:HACK
+
+Prioritize findings by importance." \
+--model deepseek-v3.1:671b-cloud
+```
+
+### Token Efficiency with Directories
+
+Directory operations are more efficient than listing files individually:
+
+| Approach | Tokens | Coverage |
+|----------|--------|----------|
+| 10 individual `@./file` refs | ~15,000 | 10 files |
+| `@./dir/:tree` | ~500 | Entire structure |
+| `@./dir/:search:pattern` | ~1,000 | All matches |
+
+**Recommendation:** Use `:tree` for structure, `:search:` for patterns, individual files only for deep analysis.
 
 ### Step 3: Execute with Appropriate Model
 
@@ -354,6 +437,72 @@ The orchestrator will:
 - Execute all 4 in parallel (2.7x speedup vs sequential)
 - Track session IDs for follow-up
 - Offer combination strategies (two-way, three-way, full synthesis)
+
+### Example 6: Directory Architecture Analysis
+**Request:** "Analyze the architecture of src/"
+
+**Your decision:**
+```bash
+# Detection:
+# - Keywords: "architecture"
+# - Target: src/ (directory)
+# - Single concern: architecture
+# - Best approach: Use @./src/:tree for structure
+
+# Route: ollama-prompt direct with :tree operation
+```
+
+**Execution:**
+```bash
+ollama-prompt --prompt "Analyze the architecture of this codebase:
+
+Project Structure:
+@./src/:tree
+
+Focus on:
+- Layer separation (presentation, business, data)
+- Module organization and cohesion
+- Design patterns identified
+- Coupling between components
+- Scalability considerations
+
+Provide specific recommendations for improvement." \
+--model kimi-k2-thinking:cloud > response.json
+```
+
+### Example 7: Directory Security Scan
+**Request:** "Check src/ for security issues"
+
+**Your decision:**
+```bash
+# Detection:
+# - Keywords: "security"
+# - Target: src/ (directory)
+# - Best approach: Use @./src/:search: for vulnerability patterns
+
+# Route: ollama-prompt direct with :search operations
+```
+
+**Execution:**
+```bash
+ollama-prompt --prompt "Security scan of codebase:
+
+Dangerous functions:
+@./src/:search:eval
+@./src/:search:exec
+@./src/:search:shell
+
+Secrets in code:
+@./src/:search:password
+@./src/:search:secret
+@./src/:search:api_key
+
+For each finding, assess:
+1. Severity (Critical/High/Medium/Low)
+2. Exploitation risk
+3. Remediation steps" \
+--model kimi-k2-thinking:cloud > response.json
+```
 
 ## Error Handling
 
