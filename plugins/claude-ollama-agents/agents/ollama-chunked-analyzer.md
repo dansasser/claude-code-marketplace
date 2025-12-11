@@ -60,7 +60,7 @@ When analyzing directories, use ollama-prompt's directory syntax for efficient a
 
 For large directories, use a **structure-first** approach:
 
-**Step 1: Get Structure Overview**
+#### Step 1: Get Structure Overview
 ```bash
 # Low token cost - shows entire structure
 ollama-prompt --prompt "Analyze the structure of this codebase:
@@ -72,10 +72,11 @@ Identify:
 - Entry points" --model kimi-k2-thinking:cloud > structure.json
 ```
 
-**Step 2: Identify Key Areas from Structure**
+#### Step 2: Identify Key Areas from Structure
+
 From the tree output, identify which subdirectories need deep analysis.
 
-**Step 3: Deep Dive with Targeted Operations**
+#### Step 3: Deep Dive with Targeted Operations
 ```bash
 # Search for specific patterns
 ollama-prompt --prompt "Security analysis:
@@ -85,7 +86,7 @@ ollama-prompt --prompt "Security analysis:
 Analyze each finding." --model kimi-k2-thinking:cloud --session-id $SESSION_ID > security.json
 ```
 
-**Step 4: Combine with Individual File Analysis**
+#### Step 4: Combine with Individual File Analysis
 For critical files identified in structure analysis:
 ```bash
 ollama-prompt --prompt "Deep review of authentication:

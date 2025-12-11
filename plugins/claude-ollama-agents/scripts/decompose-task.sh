@@ -89,8 +89,16 @@ if [[ "$TARGET_TYPE" == "directory" ]]; then
     esac
 else
     # For files, all angles analyze the same file (no directory ops)
+    # Use Python for safe JSON manipulation instead of fragile sed
     for i in "${!ANGLES[@]}"; do
-        ANGLES[$i]=$(echo "${ANGLES[$i]}" | sed "s/}/,\"scope\":\"@.\\/$TARGET\", \"directory_ops\": []}/")
+        ANGLES[$i]=$(echo "${ANGLES[$i]}" | "${PYTHON_PATH:-python3}" -c "
+import json
+import sys
+data = json.load(sys.stdin)
+data['scope'] = '@./' + sys.argv[1]
+data['directory_ops'] = []
+print(json.dumps(data))
+" "$TARGET" 2>/dev/null || echo "${ANGLES[$i]}")
     done
 fi
 
@@ -113,8 +121,14 @@ for i in "${!ANGLES[@]}"; do
         SELECTED_MODEL="kimi-k2-thinking:cloud"
     fi
 
-    # Add model to angle JSON
-    ENRICHED_ANGLE=$(echo "$ANGLE_JSON" | "${PYTHON_PATH:-python3}" -c "import json,sys; data=json.load(sys.stdin); data['model']='$SELECTED_MODEL'; print(json.dumps(data))")
+    # Add model to angle JSON - pass model via sys.argv for safety
+    ENRICHED_ANGLE=$(echo "$ANGLE_JSON" | "${PYTHON_PATH:-python3}" -c "
+import json
+import sys
+data = json.load(sys.stdin)
+data['model'] = sys.argv[1]
+print(json.dumps(data))
+" "$SELECTED_MODEL")
     ENRICHED_ANGLES+=("$ENRICHED_ANGLE")
 done
 

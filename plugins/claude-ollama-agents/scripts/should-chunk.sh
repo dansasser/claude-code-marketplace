@@ -60,23 +60,34 @@ echo ""
 
 # For directories, also suggest directory operations
 if [[ -d "$PATH_ARG" ]]; then
+    # Normalize path: remove leading ./, trailing /, handle absolute paths
+    NORMALIZED_PATH="${PATH_ARG#./}"    # Remove leading ./
+    NORMALIZED_PATH="${NORMALIZED_PATH%/}"  # Remove trailing /
+    # For absolute paths, convert to relative if under current directory
+    if [[ "$NORMALIZED_PATH" == /* ]]; then
+        CURRENT_DIR="$(pwd)"
+        if [[ "$NORMALIZED_PATH" == "$CURRENT_DIR"* ]]; then
+            NORMALIZED_PATH="${NORMALIZED_PATH#$CURRENT_DIR/}"
+        fi
+    fi
+
     echo "--- Directory Operation Recommendations ---"
     echo ""
     echo "For efficient directory analysis, consider using:"
     echo ""
     echo "  Structure overview (~500 tokens):"
-    echo "    @./${PATH_ARG%/}/:tree"
+    echo "    @./${NORMALIZED_PATH}/:tree"
     echo ""
     echo "  Security patterns (~1000 tokens each):"
-    echo "    @./${PATH_ARG%/}/:search:eval"
-    echo "    @./${PATH_ARG%/}/:search:password"
+    echo "    @./${NORMALIZED_PATH}/:search:eval"
+    echo "    @./${NORMALIZED_PATH}/:search:password"
     echo ""
     echo "  Code quality (~1000 tokens each):"
-    echo "    @./${PATH_ARG%/}/:search:TODO"
-    echo "    @./${PATH_ARG%/}/:search:FIXME"
+    echo "    @./${NORMALIZED_PATH}/:search:TODO"
+    echo "    @./${NORMALIZED_PATH}/:search:FIXME"
     echo ""
     echo "  Import analysis (~1000 tokens):"
-    echo "    @./${PATH_ARG%/}/:search:import"
+    echo "    @./${NORMALIZED_PATH}/:search:import"
     echo ""
     echo "Directory operations are much more token-efficient than"
     echo "reading all files individually."
@@ -98,8 +109,8 @@ if [[ $ESTIMATED_TOKENS -gt $THRESHOLD ]]; then
     if [[ -d "$PATH_ARG" ]]; then
         echo ""
         echo "  For directories, consider structure-first approach:"
-        echo "    1. @./${PATH_ARG%/}/:tree for overview"
-        echo "    2. @./${PATH_ARG%/}/:search:PATTERN for targeted analysis"
+        echo "    1. @./${NORMALIZED_PATH}/:tree for overview"
+        echo "    2. @./${NORMALIZED_PATH}/:search:PATTERN for targeted analysis"
         echo "    3. Individual file reads only for deep dives"
     fi
 

@@ -68,10 +68,18 @@ save_config() {
     local python_path="$1"
     local python_version="$2"
 
-    python3 <<PYTHON
+    # Use detected python if available, fallback to python3
+    local py_cmd="${python_path:-python3}"
+
+    "$py_cmd" - "$python_path" "$python_version" <<'PYTHON'
 import json
+import sys
 from pathlib import Path
 from datetime import datetime
+
+# Get arguments passed safely via sys.argv
+python_path = sys.argv[1]
+python_version = sys.argv[2]
 
 config_file = Path.home() / '.claude' / 'agents' / 'config.json'
 config_file.parent.mkdir(parents=True, exist_ok=True)
@@ -80,13 +88,15 @@ config_file.parent.mkdir(parents=True, exist_ok=True)
 try:
     with open(config_file, 'r', encoding='utf-8') as f:
         config = json.load(f)
-except:
+except FileNotFoundError:
+    config = {"version": "1.0"}
+except json.JSONDecodeError:
     config = {"version": "1.0"}
 
 # Update python config
 config['python'] = {
-    'executable': '$python_path',
-    'version': '$python_version',
+    'executable': python_path,
+    'version': python_version,
     'auto_detected': True,
     'verified_at': datetime.now().isoformat()
 }
@@ -130,11 +140,14 @@ validate_python() {
     fi
 
     # Get version
-    local version=$("$python_path" --version 2>&1 | awk '{print $2}')
+    local version
+    version=$("$python_path" --version 2>&1 | awk '{print $2}')
 
     # Check minimum version (3.8+)
-    local major=$(echo "$version" | cut -d. -f1)
-    local minor=$(echo "$version" | cut -d. -f2)
+    local major
+    major=$(echo "$version" | cut -d. -f1)
+    local minor
+    minor=$(echo "$version" | cut -d. -f2)
 
     if [[ "$major" -lt 3 ]] || { [[ "$major" -eq 3 ]] && [[ "$minor" -lt 8 ]]; }; then
         echo "[WARN] Python version $version detected. Recommended: 3.8+"
