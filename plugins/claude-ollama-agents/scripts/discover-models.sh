@@ -2,8 +2,8 @@
 # Discover available ollama models and update capabilities registry
 
 # Use Python to get proper home directory path (cross-platform)
-REGISTRY_FILE=$(python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'model-capabilities.json')")
-CACHE_DIR=$(python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'cache')")
+REGISTRY_FILE=$("${PYTHON_PATH:-python3}" -c "from pathlib import Path; print(Path.home() / '.claude' / 'model-capabilities.json')")
+CACHE_DIR=$("${PYTHON_PATH:-python3}" -c "from pathlib import Path; print(Path.home() / '.claude' / 'cache')")
 mkdir -p "$CACHE_DIR"
 
 # Initialize registry if it doesn't exist
@@ -86,7 +86,7 @@ if [[ ! -f "$REGISTRY_FILE" ]]; then
 REGISTRY_TEMPLATE
     # Set timestamp
     TIMESTAMP=$(date -Iseconds)
-    python3 <<PYTHON
+    "${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -114,7 +114,7 @@ echo "$AVAILABLE_MODELS" > "$CACHE_DIR/available_models.txt"
 
 # Check for new models
 NEW_MODELS=()
-KNOWN_MODELS=$(python3 <<PYTHON
+KNOWN_MODELS=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -157,7 +157,7 @@ fi
 echo ""
 echo "Building fallback lists from installed models..."
 
-python3 <<PYTHON
+"${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from datetime import datetime
 from pathlib import Path

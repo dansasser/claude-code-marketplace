@@ -51,11 +51,50 @@ ESTIMATED_TOKENS=$((BYTES / 4 + 1000))
 
 # Decision
 echo "Path: $PATH_ARG"
+echo "Type: $(if [[ -d "$PATH_ARG" ]]; then echo "directory"; else echo "file"; fi)"
 echo "Model: $MODEL"
 echo "Context window: $CONTEXT_WINDOW tokens"
 echo "Threshold (80%): $THRESHOLD tokens"
 echo "Estimated tokens: $ESTIMATED_TOKENS"
 echo ""
+
+# For directories, also suggest directory operations
+if [[ -d "$PATH_ARG" ]]; then
+    # Normalize path: remove leading ./, trailing /, handle absolute paths
+    NORMALIZED_PATH="${PATH_ARG#./}"    # Remove leading ./
+    NORMALIZED_PATH="${NORMALIZED_PATH%/}"  # Remove trailing /
+    # For absolute paths, convert to relative if under current directory
+    if [[ "$NORMALIZED_PATH" == /* ]]; then
+        CURRENT_DIR="$(pwd)"
+        if [[ "$NORMALIZED_PATH" == "$CURRENT_DIR"* ]]; then
+            NORMALIZED_PATH="${NORMALIZED_PATH#$CURRENT_DIR/}"
+        fi
+    fi
+
+    echo "--- Directory Operation Recommendations ---"
+    echo ""
+    echo "For efficient directory analysis, consider using:"
+    echo ""
+    echo "  Structure overview (~500 tokens):"
+    echo "    @./${NORMALIZED_PATH}/:tree"
+    echo ""
+    echo "  Security patterns (~1000 tokens each):"
+    echo "    @./${NORMALIZED_PATH}/:search:eval"
+    echo "    @./${NORMALIZED_PATH}/:search:password"
+    echo ""
+    echo "  Code quality (~1000 tokens each):"
+    echo "    @./${NORMALIZED_PATH}/:search:TODO"
+    echo "    @./${NORMALIZED_PATH}/:search:FIXME"
+    echo ""
+    echo "  Import analysis (~1000 tokens):"
+    echo "    @./${NORMALIZED_PATH}/:search:import"
+    echo ""
+    echo "Directory operations are much more token-efficient than"
+    echo "reading all files individually."
+    echo ""
+    echo "-------------------------------------------"
+    echo ""
+fi
 
 if [[ $ESTIMATED_TOKENS -gt $THRESHOLD ]]; then
     echo "[WARN] CHUNKING REQUIRED"
@@ -65,6 +104,15 @@ if [[ $ESTIMATED_TOKENS -gt $THRESHOLD ]]; then
     # Suggest chunk count
     SUGGESTED_CHUNKS=$(( (ESTIMATED_TOKENS + THRESHOLD - 1) / THRESHOLD ))
     echo "  Suggested chunks: $SUGGESTED_CHUNKS"
+
+    # For directories, suggest structure-first approach
+    if [[ -d "$PATH_ARG" ]]; then
+        echo ""
+        echo "  For directories, consider structure-first approach:"
+        echo "    1. @./${NORMALIZED_PATH}/:tree for overview"
+        echo "    2. @./${NORMALIZED_PATH}/:search:PATTERN for targeted analysis"
+        echo "    3. Individual file reads only for deep dives"
+    fi
 
     exit 0
 else
@@ -76,6 +124,14 @@ else
     HEADROOM=$((THRESHOLD - ESTIMATED_TOKENS))
     HEADROOM_PCT=$((HEADROOM * 100 / THRESHOLD))
     echo "  Headroom: $HEADROOM tokens ($HEADROOM_PCT%)"
+
+    # For directories, still recommend directory ops for efficiency
+    if [[ -d "$PATH_ARG" ]]; then
+        echo ""
+        echo "  Tip: Even though chunking isn't required, using"
+        echo "  directory operations (@./dir/:tree, @./dir/:search:)"
+        echo "  will be more token-efficient than reading all files."
+    fi
 
     exit 1
 fi

@@ -2,7 +2,7 @@
 
 Comprehensive analysis using parallel orchestrator with multiple perspectives.
 
-**Usage:** `/deep-analyze <file> [perspectives]`
+**Usage:** `/deep-analyze <file_or_directory> [perspectives]`
 
 **Perspectives:** (comma-separated, max 4)
 - `security`: Security vulnerabilities and threat modeling
@@ -14,7 +14,8 @@ Comprehensive analysis using parallel orchestrator with multiple perspectives.
 **Examples:**
 - `/deep-analyze implementation-plan.md` - Auto-select perspectives
 - `/deep-analyze src/auth.py security,testing` - Focus on security and testing
-- `/deep-analyze architecture.md architecture,scalability` - Architecture focused
+- `/deep-analyze src/ architecture,security` - Directory analysis with multiple perspectives
+- `/deep-analyze src/api/ security,performance` - API directory deep analysis
 
 ---
 
@@ -54,7 +55,19 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
      * Track sessions
      * Synthesize results
 
-4. **Perspectives Explained:**
+4. **Directory Operations by Perspective:**
+
+   Each perspective uses optimal directory operations:
+
+   | Perspective | Primary Operation | Example |
+   |-------------|-------------------|---------|
+   | security | `@./dir/:search:PATTERN` | `@./src/:search:eval`, `@./src/:search:password` |
+   | architecture | `@./dir/:tree` | `@./src/:tree` |
+   | implementation | `@./dir/:search:TODO` | `@./src/:search:TODO`, `@./src/:search:FIXME` |
+   | testing | `@./tests/:tree` | `@./tests/:tree`, `@./src/:search:test` |
+   | performance | `@./dir/:search:PATTERN` | `@./src/:search:for.*in`, `@./src/:search:query` |
+
+5. **Perspectives Explained:**
 
    **Security:**
    - Vulnerabilities and attack vectors
@@ -62,6 +75,7 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
    - Authentication/authorization
    - Input validation
    - Secrets management
+   - **Directory ops:** `@./src/:search:eval`, `@./src/:search:password`, `@./src/:search:secret`
 
    **Architecture:**
    - Design patterns
@@ -69,6 +83,7 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
    - Separation of concerns
    - Modularity and coupling
    - Scalability considerations
+   - **Directory ops:** `@./src/:tree`, `@./src/:search:import`
 
    **Implementation:**
    - Code quality and readability
@@ -76,6 +91,7 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
    - Error handling
    - Edge case coverage
    - Refactoring opportunities
+   - **Directory ops:** `@./src/:search:TODO`, `@./src/:search:FIXME`, `@./src/:tree`
 
    **Testing:**
    - Test coverage assessment
@@ -83,6 +99,7 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
    - Edge cases and corner cases
    - Integration points
    - Test quality
+   - **Directory ops:** `@./tests/:tree`, `@./src/:search:@pytest`
 
    **Performance:**
    - Bottleneck identification
@@ -90,15 +107,16 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
    - Resource utilization
    - Caching opportunities
    - Optimization recommendations
+   - **Directory ops:** `@./src/:search:for.*range`, `@./src/:search:while`, `@./src/:search:query`
 
-5. **Your Role:**
+6. **Your Role:**
    - Invoke ollama-parallel-orchestrator agent via Task tool
    - Receive comprehensive synthesized analysis
    - Format report for user
    - Highlight critical findings
    - Present prioritized recommendations
 
-6. **Expected Report Format (from agent):**
+7. **Expected Report Format (from agent):**
    ```
    # Deep Analysis Report
 
@@ -134,7 +152,7 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
    [Actionable items]
    ```
 
-7. **Session Tracking:**
+8. **Session Tracking:**
    - Agent saves results to `~/.claude/orchestrations/[id].json`
    - Session includes all perspective analyses
    - Synthesis strategy applied
@@ -159,5 +177,12 @@ You are performing deep multi-perspective analysis using the parallel orchestrat
 - Saves ~70% of Claude's context
 - Enables multiple comprehensive analyses per session
 - Parallel execution faster than sequential
+
+**Directory Analysis Benefits:**
+- Each perspective uses optimal directory operations
+- Security: `@./dir/:search:` finds vulnerability patterns across codebase
+- Architecture: `@./dir/:tree` shows complete structure in ~500 tokens
+- Implementation: `@./dir/:search:TODO` finds all incomplete work
+- Saves 85-97% tokens compared to reading files individually
 
 **Remember:** This invokes the most comprehensive analysis. The parallel orchestrator handles all complexity. You just present the synthesized results clearly.

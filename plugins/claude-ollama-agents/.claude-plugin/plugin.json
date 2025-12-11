@@ -1,7 +1,7 @@
 {
   "name": "ollama-agents",
-  "version": "1.0.1",
-  "description": "Intelligent multi-agent system for delegating analysis, code review, and complex reasoning tasks to local ollama models. Saves 70%+ of Claude's context budget with automatic model selection and parallel processing.",
+  "version": "1.1.0",
+  "description": "Intelligent multi-agent system for delegating analysis, code review, and complex reasoning tasks to local ollama models. Saves 70%+ of Claude's context budget with automatic model selection, parallel processing, and directory operations support.",
   "author": {
     "name": "Daniel T Sasser II",
     "email": "contact@dansasser.me",
@@ -19,6 +19,7 @@
     "context-efficiency",
     "parallel-processing",
     "security-analysis",
-    "architecture-analysis"
+    "architecture-analysis",
+    "directory-operations"
   ]
 }

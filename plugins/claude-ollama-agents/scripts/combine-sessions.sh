@@ -14,7 +14,7 @@ fi
 
 COMBINATION_TYPE="$1"
 ORCH_ID="$2"
-REGISTRY_DIR=$(python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'orchestrations')")
+REGISTRY_DIR=$("${PYTHON_PATH:-python3}" -c "from pathlib import Path; print(Path.home() / '.claude' / 'orchestrations')")
 REGISTRY_FILE="$REGISTRY_DIR/${ORCH_ID}.json"
 
 if [[ ! -f "$REGISTRY_FILE" ]]; then
@@ -24,8 +24,8 @@ fi
 
 # Load orchestration data
 ORCH_DATA=$(cat "$REGISTRY_FILE")
-TARGET=$(echo "$ORCH_DATA" | python3 -c "import json,sys; print(json.load(sys.stdin)['target'])")
-STRATEGY=$(echo "$ORCH_DATA" | python3 -c "import json,sys; print(json.load(sys.stdin)['strategy'])")
+TARGET=$(echo "$ORCH_DATA" | "${PYTHON_PATH:-python3}" -c "import json,sys; print(json.load(sys.stdin)['target'])")
+STRATEGY=$(echo "$ORCH_DATA" | "${PYTHON_PATH:-python3}" -c "import json,sys; print(json.load(sys.stdin)['strategy'])")
 
 # Function to get angle summary
 get_angle_summary() {
@@ -36,7 +36,7 @@ get_angle_summary() {
 
     if [[ -n "$result_file" ]] && [[ -f "$result_file" ]]; then
         # Extract response/thinking from result file
-        RESPONSE=$(python3 <<PYTHON
+        RESPONSE=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 import sys
 
@@ -74,7 +74,7 @@ case "$COMBINATION_TYPE" in
         ANGLE2="$4"
 
         # Get angle details
-        ANGLE1_DATA=$(python3 <<PYTHON
+        ANGLE1_DATA=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -88,7 +88,7 @@ for angle in data['angles']:
 PYTHON
 )
 
-        ANGLE2_DATA=$(python3 <<PYTHON
+        ANGLE2_DATA=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -145,7 +145,7 @@ EOF
         SESSIONS=()
 
         for angle_num in "${ANGLES[@]}"; do
-            ANGLE_DATA=$(python3 <<PYTHON
+            ANGLE_DATA=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -188,7 +188,7 @@ EOF
 
     full-synthesis)
         # Combine all angles
-        ALL_ANGLES=$(python3 <<PYTHON
+        ALL_ANGLES=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 
@@ -231,7 +231,7 @@ PYTHON
         PROMPT="CONTEXT: You previously analyzed \"$TARGET\" from selected perspectives:\n\n"
 
         for angle_num in "${ANGLE_ARRAY[@]}"; do
-            ANGLE_DATA=$(python3 <<PYTHON
+            ANGLE_DATA=$("${PYTHON_PATH:-python3}" <<PYTHON
 import json
 from pathlib import Path
 

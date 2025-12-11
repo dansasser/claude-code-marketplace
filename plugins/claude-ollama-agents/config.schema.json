@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Claude Ollama Agents Configuration",
+  "description": "Configuration schema for claude-ollama-agents plugin",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Configuration format version"
+    },
+    "python": {
+      "type": "object",
+      "required": ["executable", "version"],
+      "properties": {
+        "executable": {
+          "type": "string",
+          "description": "Full path to Python 3 executable"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Python version (e.g., 3.10.19)"
+        },
+        "auto_detected": {
+          "type": "boolean",
+          "description": "Whether Python path was auto-detected or manually configured"
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of last verification"
+        }
+      }
+    },
+    "models": {
+      "type": "object",
+      "properties": {
+        "registry_path": {
+          "type": "string",
+          "description": "Path to model capabilities registry (default: ~/.claude/model-capabilities.json)"
+        }
+      }
+    }
+  }
+}
