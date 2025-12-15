@@ -1,0 +1,66 @@
+commit:
+  # Commit message format
+  format: "conventional"
+
+  # Commit types and their meanings
+  types:
+    - type: "feat"
+      description: "New feature"
+      bump: "minor"
+
+    - type: "fix"
+      description: "Bug fix"
+      bump: "patch"
+
+    - type: "docs"
+      description: "Documentation only"
+      bump: null
+
+    - type: "style"
+      description: "Formatting, no code change"
+      bump: null
+
+    - type: "refactor"
+      description: "Code restructuring"
+      bump: null
+
+    - type: "perf"
+      description: "Performance improvement"
+      bump: "patch"
+
+    - type: "test"
+      description: "Adding or updating tests"
+      bump: null
+
+    - type: "build"
+      description: "Build system changes"
+      bump: null
+
+    - type: "ci"
+      description: "CI configuration changes"
+      bump: null
+
+    - type: "chore"
+      description: "Maintenance tasks"
+      bump: null
+
+    - type: "revert"
+      description: "Reverting a previous commit"
+      bump: "patch"
+
+  # Breaking change indicators
+  breaking_change:
+    indicator: "!"
+    footer: "BREAKING CHANGE:"
+    bump: "major"
+
+  # Scope settings
+  scope:
+    required: false
+    allowed: []  # Empty means any scope
+
+  # Subject line settings
+  subject:
+    max_length: 72
+    capitalize: false
+    end_period: false

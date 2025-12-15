@@ -1,0 +1,35 @@
+coverage:
+  # Minimum overall coverage percentage
+  minimum_threshold: 80
+
+  # Fail if coverage drops below this
+  fail_under: 80
+
+  # Minimum coverage per file
+  per_file_minimum: 60
+
+  # Enable branch coverage
+  branch_coverage: true
+
+  # Patterns to exclude from coverage
+  exclude_patterns:
+    - "*/tests/*"
+    - "*/__pycache__/*"
+    - "*/.venv/*"
+    - "*/migrations/*"
+    - "*/_version.py"
+    - "*/conftest.py"
+
+  # Report formats to generate
+  report_formats:
+    - terminal
+    - html
+    - xml
+    - json
+
+  # Badge thresholds for README badges
+  badge_thresholds:
+    excellent: 90
+    good: 80
+    acceptable: 70
+    poor: 60

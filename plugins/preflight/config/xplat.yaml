@@ -1,0 +1,81 @@
+cross_platform:
+  # Path handling checks
+  paths:
+    forbidden_patterns:
+      - pattern: '(?<!["\x27])/(?!/|\*)'
+        description: "Unquoted forward slash in path"
+        severity: error
+
+      - pattern: '\\\\\\\\'
+        description: "Hardcoded double backslash"
+        severity: error
+
+      - pattern: 'os\.path\.join\([^)]*["\x27][^"\x27]*/[^"\x27]*["\x27]'
+        description: "Forward slash inside os.path.join"
+        severity: warning
+
+    recommended_patterns:
+      - "Path(__file__).parent"
+      - "Path.home()"
+      - "os.path.join()"
+      - "pathlib.Path()"
+
+  # Line ending checks
+  line_endings:
+    enforce: LF
+    gitattributes_required: true
+    gitattributes_content: |
+      * text=auto eol=lf
+      *.py text eol=lf
+      *.md text eol=lf
+      *.yml text eol=lf
+      *.yaml text eol=lf
+      *.json text eol=lf
+      *.sh text eol=lf
+      *.ps1 text eol=crlf
+      *.bat text eol=crlf
+
+  # Environment variable checks
+  env_vars:
+    forbidden:
+      - pattern: '\$HOME(?![A-Z_])'
+        use_instead: "Path.home()"
+
+      - pattern: '\$USER(?![A-Z_])'
+        use_instead: "getpass.getuser()"
+
+      - pattern: '%USERPROFILE%'
+        use_instead: "Path.home()"
+
+      - pattern: '%USERNAME%'
+        use_instead: "getpass.getuser()"
+
+      - pattern: '%TEMP%'
+        use_instead: "tempfile.gettempdir()"
+
+      - pattern: '%TMP%'
+        use_instead: "tempfile.gettempdir()"
+
+  # Temp file checks
+  temp_paths:
+    forbidden:
+      - "/tmp"
+      - "/var/tmp"
+      - "C:\\Temp"
+      - "C:\\Windows\\Temp"
+    use_instead: "tempfile.gettempdir()"
+
+  # Shell command checks
+  shell_commands:
+    forbidden_patterns:
+      - "os.system("
+      - "subprocess.call(.*shell=True"
+      - "/bin/sh"
+      - "/bin/bash"
+    recommended: "subprocess.run with shell=False and list args"
+
+  # Case sensitivity checks
+  case_sensitivity:
+    check_duplicates: true
+    check_imports: true
+    check_config_references: true

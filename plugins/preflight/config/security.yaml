@@ -1,0 +1,70 @@
+security:
+  # Secret scanning
+  secrets:
+    enabled: true
+    patterns:
+      - "api_key"
+      - "api_secret"
+      - "apikey"
+      - "password"
+      - "passwd"
+      - "secret"
+      - "token"
+      - "private_key"
+      - "privatekey"
+      - "aws_access_key"
+      - "aws_secret_key"
+      - "database_url"
+      - "db_password"
+
+    # Files to always exclude
+    exclude_files:
+      - "*.example"
+      - "*.sample"
+      - "*.template"
+      - "test_*.py"
+      - "*_test.py"
+
+  # Dependency vulnerability audit
+  vulnerabilities:
+    enabled: true
+    tool: "pip-audit"
+
+    # Fail on these severities
+    fail_on:
+      - critical
+      - high
+
+    # Warn but don't fail
+    warn_on:
+      - moderate
+
+    # Ignore specific CVEs (use sparingly)
+    ignore: []
+
+  # License compatibility
+  licenses:
+    enabled: true
+
+    # Allowed licenses
+    allowed:
+      - "MIT"
+      - "Apache-2.0"
+      - "BSD-2-Clause"
+      - "BSD-3-Clause"
+      - "ISC"
+      - "PSF-2.0"
+      - "Python-2.0"
+      - "Unlicense"
+      - "CC0-1.0"
+
+    # Forbidden licenses
+    forbidden:
+      - "GPL-2.0"
+      - "GPL-3.0"
+      - "AGPL-3.0"
+      - "LGPL-2.0"
+      - "LGPL-3.0"
+
+    # What to do with unknown licenses
+    unknown_action: "warn"
