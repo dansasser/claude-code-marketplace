@@ -1,0 +1,56 @@
+packaging:
+  # Required fields in pyproject.toml
+  pyproject_required:
+    - "project.name"
+    - "project.version"
+    - "project.description"
+    - "project.readme"
+    - "project.license"
+    - "project.authors"
+    - "project.requires-python"
+
+  # Recommended fields
+  pyproject_recommended:
+    - "project.classifiers"
+    - "project.keywords"
+    - "project.urls"
+    - "project.dependencies"
+    - "project.optional-dependencies"
+
+  # Required classifiers
+  classifiers:
+    required_categories:
+      - "Development Status"
+      - "Intended Audience"
+      - "License"
+      - "Programming Language :: Python"
+
+  # README requirements
+  readme:
+    formats:
+      - "README.md"
+      - "README.rst"
+    min_length: 500
+    required_sections:
+      - "Installation"
+      - "Usage"
+
+  # Version requirements
+  version:
+    format: "semver"
+    locations:
+      - "pyproject.toml"
+      - "__init__.py"
+    must_match: true
+
+  # Entry point testing
+  entry_points:
+    test_with_help: true
+    timeout_seconds: 10
+
+  # Build settings
+  build:
+    wheel: true
+    sdist: true
+    twine_check: true
+    test_install: true

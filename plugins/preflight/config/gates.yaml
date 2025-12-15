@@ -1,0 +1,87 @@
+pipeline:
+  name: preflight
+  version: 1.0.0
+  description: Python package CI/CD quality gates
+
+gates:
+  - name: lint-test
+    display_name: "Lint & Test"
+    agent: lint-test
+    required: true
+    timeout_seconds: 300
+    depends_on: []
+
+  - name: coverage
+    display_name: "Coverage"
+    agent: coverage
+    required: true
+    timeout_seconds: 120
+    depends_on:
+      - lint-test
+
+  - name: cross-platform
+    display_name: "Cross-Platform"
+    agent: cross-platform
+    required: true
+    timeout_seconds: 300
+    depends_on:
+      - lint-test
+      - coverage
+
+  - name: python-matrix
+    display_name: "Python Matrix"
+    agent: python-matrix
+    required: true
+    timeout_seconds: 600
+    depends_on:
+      - lint-test
+      - coverage
+      - cross-platform
+
+  - name: security
+    display_name: "Security"
+    agent: security
+    required: true
+    timeout_seconds: 180
+    depends_on:
+      - lint-test
+      - coverage
+      - cross-platform
+      - python-matrix
+
+  - name: api-compat
+    display_name: "API Compatibility"
+    agent: api-compat
+    required: true
+    timeout_seconds: 120
+    depends_on:
+      - lint-test
+      - coverage
+      - cross-platform
+      - python-matrix
+      - security
+
+  - name: packaging
+    display_name: "Package Build"
+    agent: packaging
+    required: true
+    timeout_seconds: 300
+    depends_on:
+      - lint-test
+      - coverage
+      - cross-platform
+      - python-matrix
+      - security
+      - api-compat
+
+  - name: github-pr
+    display_name: "GitHub PR"
+    agent: github-pr
+    required: true
+    requires_all_gates: true
+    timeout_seconds: 60
+
+settings:
+  fail_fast: true
+  state_file: state/pipeline_state.json
+  verbose_logging: true

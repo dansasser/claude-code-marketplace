@@ -5,7 +5,7 @@
     "email": "contact@dansasser.me",
     "url": "https://github.com/dansasser"
   },
-  "description": "Claude Code plugins for ollama integration and AI-assisted development",
+  "description": "Claude Code plugins for ollama integration, AI-assisted development, and Python package quality assurance",
   "plugins": [
     {
       "name": "ollama-agents",
@@ -19,6 +19,19 @@
       },
       "keywords": ["ollama", "agents", "analysis", "code-review", "multi-model", "context-efficiency"],
       "category": "productivity"
+    },
+    {
+      "name": "preflight",
+      "source": "./plugins/preflight",
+      "description": "Multi-agent CI/CD pipeline ensuring Python packages pass cross-platform, multi-version, and quality gates before shipping. 8 sequential gates: lint, coverage, cross-platform, Python matrix, security, API compat, packaging, and GitHub PR.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Daniel T Sasser II",
+        "email": "contact@dansasser.me",
+        "url": "https://github.com/dansasser"
+      },
+      "keywords": ["ci-cd", "python", "cross-platform", "testing", "packaging", "quality-gates", "pypi", "github", "security"],
+      "category": "development-tools"
     }
   ]
 }

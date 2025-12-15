@@ -1,0 +1,54 @@
+api_compatibility:
+  # How to detect public API
+  public_api_detection:
+    use_all_exports: true
+    include_public_classes: true
+    include_public_functions: true
+    include_public_methods: true
+    exclude_prefixes:
+      - "_"
+      - "__"
+
+  # Breaking change types
+  breaking_changes:
+    severity: error
+    types:
+      - removed_function
+      - removed_class
+      - removed_method
+      - removed_parameter
+      - changed_parameter_type
+      - changed_return_type
+      - changed_parameter_default
+      - made_parameter_required
+      - changed_exception_type
+
+  # Non-breaking change types (info only)
+  non_breaking_changes:
+    severity: info
+    types:
+      - added_function
+      - added_class
+      - added_method
+      - added_optional_parameter
+      - added_module
+
+  # Deprecation handling
+  deprecation:
+    require_warning: true
+    minimum_versions_before_removal: 2
+    require_alternative: true
+
+  # Comparison baseline
+  comparison:
+    # Where to get baseline from
+    source: "latest_release_tag"
+
+    # Fallback if no release tag
+    fallback: "main"
+
+    # Exclude these from comparison
+    exclude_patterns:
+      - "*/tests/*"
+      - "*/_internal/*"
+      - "*/migrations/*"

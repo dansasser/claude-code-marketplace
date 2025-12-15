@@ -1,0 +1,35 @@
+python_matrix:
+  # Minimum supported version
+  minimum: "3.9"
+
+  # Maximum supported version
+  maximum: "3.13"
+
+  # All versions to test
+  versions:
+    - version: "3.9"
+      required: true
+      eol_date: "2025-10"
+
+    - version: "3.10"
+      required: true
+      eol_date: "2026-10"
+
+    - version: "3.11"
+      required: true
+      eol_date: "2027-10"
+
+    - version: "3.12"
+      required: true
+      eol_date: "2028-10"
+
+    - version: "3.13"
+      required: true
+      eol_date: "2029-10"
+
+  # Commands
+  test_command: "pytest -v"
+  install_command: "pip install -e .[dev]"
+
+  # Run versions in parallel
+  parallel: true
