@@ -421,53 +421,58 @@ def diagnose_error(stderr: str, stdout: str) -> ErrorType:
     # If no pattern matched but there's an error, it's likely code
     return ErrorType.CODE_ERROR
 
-def recover_node(error_type: ErrorType, project_dir: Path) -> bool:
+def recover_node(error_type: ErrorType, project_dir: Path) -> Tuple[bool, str]:
     """
     Attempt recovery for Node.js projects.
-    Returns True if recovery was attempted.
+    Returns Tuple of (recovery_attempted, message).
     ALL file operations use pathlib/shutil.
     """
     node_modules = project_dir / "node_modules"
     lock_file = project_dir / "package-lock.json"
     dist_dir = project_dir / "dist"
 
-    if error_type == ErrorType.DEP_CORRUPTION:
-        # Delete node_modules and reinstall
-        if node_modules.exists():
-            shutil.rmtree(node_modules)
-        subprocess.run(["npm", "install"], cwd=project_dir, check=True)
-        return True
+    try:
+        if error_type == ErrorType.DEP_CORRUPTION:
+            # Delete node_modules and reinstall
+            if node_modules.exists():
+                shutil.rmtree(node_modules)
+            subprocess.run(["npm", "install"], cwd=project_dir, check=True)
+            return True, "[OK] Reinstalled dependencies"
 
-    elif error_type == ErrorType.LOCK_DESYNC:
-        # Delete lock file and reinstall
-        if lock_file.exists():
-            lock_file.unlink()
-        if node_modules.exists():
-            shutil.rmtree(node_modules)
-        subprocess.run(["npm", "install"], cwd=project_dir, check=True)
-        return True
+        elif error_type == ErrorType.LOCK_DESYNC:
+            # Delete lock file and reinstall
+            if lock_file.exists():
+                lock_file.unlink()
+            if node_modules.exists():
+                shutil.rmtree(node_modules)
+            subprocess.run(["npm", "install"], cwd=project_dir, check=True)
+            return True, "[OK] Regenerated lock file"
 
-    elif error_type == ErrorType.STALE_ARTIFACTS:
-        # Delete dist and rebuild
-        if dist_dir.exists():
-            shutil.rmtree(dist_dir)
-        subprocess.run(["npm", "run", "build"], cwd=project_dir, check=True)
-        return True
+        elif error_type == ErrorType.STALE_ARTIFACTS:
+            # Delete dist and rebuild
+            if dist_dir.exists():
+                shutil.rmtree(dist_dir)
+            return True, "[OK] Cleaned build artifacts"
 
-    elif error_type == ErrorType.CACHE_POISON:
-        # Clean npm cache
-        subprocess.run(["npm", "cache", "clean", "--force"], check=True)
-        if node_modules.exists():
-            shutil.rmtree(node_modules)
-        subprocess.run(["npm", "install"], cwd=project_dir, check=True)
-        return True
+        elif error_type == ErrorType.CACHE_POISON:
+            # Clean npm cache
+            subprocess.run(["npm", "cache", "clean", "--force"], check=True)
+            if node_modules.exists():
+                shutil.rmtree(node_modules)
+            subprocess.run(["npm", "install"], cwd=project_dir, check=True)
+            return True, "[OK] Cleaned cache and reinstalled"
 
-    return False  # CODE_ERROR or UNKNOWN - cannot auto-fix
+        return False, "[WARN] Cannot auto-fix this error type"
 
-def recover_python(error_type: ErrorType, project_dir: Path) -> bool:
+    except subprocess.CalledProcessError as e:
+        return False, f"[FAIL] Recovery failed: {e}"
+    except Exception as e:
+        return False, f"[FAIL] Recovery error: {e}"
+
+def recover_python(error_type: ErrorType, project_dir: Path) -> Tuple[bool, str]:
     """
     Attempt recovery for Python projects.
-    Returns True if recovery was attempted.
+    Returns Tuple of (recovery_attempted, message).
     ALL file operations use pathlib/shutil.
     """
     venv_dir = project_dir / ".venv"
@@ -475,37 +480,43 @@ def recover_python(error_type: ErrorType, project_dir: Path) -> bool:
     egg_info = list(project_dir.glob("*.egg-info"))
     pycache = list(project_dir.rglob("__pycache__"))
 
-    if error_type == ErrorType.DEP_CORRUPTION:
-        # Delete .venv and reinstall
-        if venv_dir.exists():
-            shutil.rmtree(venv_dir)
-        # Clean pycache
-        for cache in pycache:
-            shutil.rmtree(cache)
-        subprocess.run(["pip", "install", "-e", ".[dev]"],
-                      cwd=project_dir, check=True)
-        return True
+    try:
+        if error_type == ErrorType.DEP_CORRUPTION:
+            # Delete .venv and reinstall
+            if venv_dir.exists():
+                shutil.rmtree(venv_dir)
+            # Clean pycache
+            for cache in pycache:
+                shutil.rmtree(cache)
+            subprocess.run(["pip", "install", "-e", ".[dev]"],
+                          cwd=project_dir, check=True)
+            return True, "[OK] Reinstalled dependencies"
 
-    elif error_type == ErrorType.STALE_ARTIFACTS:
-        # Delete dist and egg-info
-        if dist_dir.exists():
-            shutil.rmtree(dist_dir)
-        for egg in egg_info:
-            shutil.rmtree(egg)
-        subprocess.run(["python", "-m", "build"],
-                      cwd=project_dir, check=True)
-        return True
+        elif error_type == ErrorType.STALE_ARTIFACTS:
+            # Delete dist and egg-info
+            if dist_dir.exists():
+                shutil.rmtree(dist_dir)
+            for egg in egg_info:
+                shutil.rmtree(egg)
+            return True, "[OK] Cleaned build artifacts"
 
-    elif error_type == ErrorType.CACHE_POISON:
-        # Purge pip cache
-        subprocess.run(["pip", "cache", "purge"], check=True)
-        if venv_dir.exists():
-            shutil.rmtree(venv_dir)
-        subprocess.run(["pip", "install", "-e", ".[dev]"],
-                      cwd=project_dir, check=True)
-        return True
+        elif error_type == ErrorType.CACHE_POISON:
+            # Purge pip cache
+            subprocess.run(["pip", "cache", "purge"], check=False)
+            if venv_dir.exists():
+                shutil.rmtree(venv_dir)
+            subprocess.run(["pip", "install", "-e", ".[dev]"],
+                          cwd=project_dir, check=True)
+            return True, "[OK] Cleaned cache and reinstalled"
 
-    return False  # CODE_ERROR or UNKNOWN - cannot auto-fix
+        # CODE_ERROR, VERSION_MISMATCH, LOCK_DESYNC (Python rarely has this),
+        # UNKNOWN - cannot auto-fix
+        return False, "[WARN] Cannot auto-fix this error type"
+
+    except subprocess.CalledProcessError as e:
+        return False, f"[FAIL] Recovery failed: {e}"
+    except Exception as e:
+        return False, f"[FAIL] Recovery error: {e}"
 ```
 
 ---

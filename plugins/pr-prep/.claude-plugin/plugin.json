@@ -7,8 +7,8 @@
     "email": "contact@dansasser.me",
     "url": "https://github.com/dansasser"
   },
-  "homepage": "https://github.com/dansasser/pr-prep",
-  "repository": "https://github.com/dansasser/pr-prep",
+  "homepage": "https://github.com/dansasser/claude-code-marketplace/tree/main/plugins/pr-prep",
+  "repository": "https://github.com/dansasser/claude-code-marketplace",
   "license": "MIT",
   "keywords": [
     "pr",
