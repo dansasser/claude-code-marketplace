@@ -1,0 +1,47 @@
+{
+  "name": "pr-prep",
+  "version": "1.0.0",
+  "description": "Automated PR preparation with local CI validation, smart error recovery, and Mermaid diagram generation. Takes any branch state to published package.",
+  "author": {
+    "name": "Daniel T Sasser II",
+    "email": "contact@dansasser.me",
+    "url": "https://github.com/dansasser"
+  },
+  "homepage": "https://github.com/dansasser/claude-code-marketplace/tree/main/plugins/pr-prep",
+  "repository": "https://github.com/dansasser/claude-code-marketplace",
+  "license": "MIT",
+  "keywords": [
+    "pr",
+    "pull-request",
+    "ci",
+    "local-ci",
+    "workflow",
+    "github-actions",
+    "automation",
+    "pre-push",
+    "testing",
+    "mermaid",
+    "cross-platform"
+  ],
+  "category": "Development Tools",
+  "agents": [
+    {
+      "name": "pr-prep-orchestrator",
+      "description": "Main orchestrator - coordinates all PR preparation phases from branch analysis to package publish"
+    },
+    {
+      "name": "pr-composer",
+      "description": "PR body generator with Mermaid diagrams and CI results formatting"
+    }
+  ],
+  "commands": [
+    {
+      "name": "prep-pr",
+      "description": "Full PR preparation pipeline: detect, validate, CI, commit, push, PR"
+    }
+  ],
+  "dependencies": {
+    "python": ">=3.10",
+    "tools": ["git"]
+  }
+}

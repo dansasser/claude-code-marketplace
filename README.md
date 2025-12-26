@@ -1,6 +1,6 @@
 # Claude Code Marketplace - Daniel T Sasser II
 
-Claude Code plugins for ollama integration, AI-assisted development, and Python package quality assurance.
+Claude Code plugins for ollama integration, AI-assisted development, Python/Node.js CI/CD automation, and package quality assurance.
 
 ## Available Plugins
 
@@ -51,6 +51,41 @@ Multi-agent CI/CD pipeline ensuring Python packages pass cross-platform, multi-v
 
 [Full Documentation](./plugins/preflight/README.md)
 
+---
+
+### pr-prep
+
+Automated PR preparation with local CI validation, smart error recovery, and Mermaid diagram generation.
+
+**Features:**
+- Takes any branch state (committed, uncommitted, unknown) to published package
+- Runs local CI BEFORE pushing to prevent GitHub CI failures
+- Auto-detects Python and Node.js/TypeScript projects
+- Smart error recovery (fixes corrupted deps, stale artifacts, lock file issues)
+- Generates CI workflows if missing
+- Creates detailed PRs with Mermaid diagrams
+- Uses MCP GitHub tools by default, gh CLI as fallback
+- Cross-platform (Windows, macOS, Linux)
+
+**Commands:**
+- `/prep-pr` - Full PR preparation pipeline
+- `/prep-pr --no-push` - Run CI only, don't push
+- `/prep-pr --resume` - Resume from last failure
+- `/prep-pr --merge` - Auto-merge after CI passes
+- `/prep-pr --release` - Create version tag after merge
+
+**Error Recovery:**
+- Dependency corruption - Cleans and reinstalls
+- Lock file desync - Regenerates lock files
+- Stale artifacts - Cleans build outputs
+- Cache corruption - Purges and rebuilds
+
+**Version:** 1.0.0
+**Category:** Development Tools
+**License:** MIT
+
+[Full Documentation](./plugins/pr-prep/README.md)
+
 ## Installation
 
 ### Add This Marketplace to Claude Code
@@ -100,6 +135,12 @@ Plugins in this marketplace may have specific requirements. Check each plugin's 
 1. Python >= 3.9
 2. Install dev tools: `pip install ruff mypy pytest pytest-cov build twine pip-audit`
 
+**For pr-prep:**
+1. Python >= 3.10 (for running helper scripts)
+2. Git with remote configured
+3. For Python projects: `pip install ruff mypy pytest build`
+4. For Node projects: npm/yarn/pnpm/bun with eslint, typescript
+
 ## Plugin Structure
 
 This marketplace follows the official Claude Code plugin structure:
@@ -117,15 +158,24 @@ claude-code-marketplace/
     │   ├── scripts/           # Helper scripts
     │   └── README.md
     │
-    └── preflight/             # Python CI/CD pipeline
+    ├── preflight/             # Python CI/CD pipeline
+    │   ├── .claude-plugin/
+    │   │   └── plugin.json
+    │   ├── .claude/
+    │   │   ├── agents/        # 11 gate agents
+    │   │   ├── commands/      # 8 slash commands
+    │   │   └── skills/        # Skills with scripts
+    │   ├── config/            # YAML configuration
+    │   ├── CLAUDE.md          # Governance rules
+    │   └── README.md
+    │
+    └── pr-prep/               # PR preparation pipeline
         ├── .claude-plugin/
         │   └── plugin.json
-        ├── .claude/
-        │   ├── agents/        # 11 gate agents
-        │   ├── commands/      # 8 slash commands
-        │   └── skills/        # Skills with scripts
-        ├── config/            # YAML configuration
-        ├── CLAUDE.md          # Governance rules
+        ├── agents/            # Orchestrator + composer
+        ├── commands/          # /prep-pr command
+        ├── scripts/           # Python helper scripts
+        ├── templates/         # CI workflow templates
         └── README.md
 ```
 
