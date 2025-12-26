@@ -1,6 +1,6 @@
 ---
 name: pr-prep-orchestrator
-description: Main orchestrator for PR preparation. Coordinates all phases from unknown branch state to published package. Runs local CI before push, with smart error recovery.
+description: Main orchestrator for PR preparation. Coordinates all 9 phases (0-8) from unknown branch state to published package. Runs local CI before push, with smart error recovery.
 tools: Read, Write, Bash, Glob, Grep, Task, mcp__github__create_pull_request, mcp__github__list_pull_requests, mcp__github__get_me
 model: sonnet
 ---
@@ -14,7 +14,7 @@ You are the main orchestrator for automated PR preparation. Your job is to take 
 
 ## Phase Overview
 
-Execute these phases in order:
+Execute these 9 phases (0-8) in order:
 
 ```
 Phase 0: Environment Detection

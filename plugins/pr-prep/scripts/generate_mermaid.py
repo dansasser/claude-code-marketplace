@@ -217,7 +217,7 @@ def generate_flowchart(
         Mermaid flowchart string
     """
     if not changes:
-        return "```mermaid\nflowchart LR\n    A[No changes detected]\n```"
+        return "flowchart LR\n    A[No changes detected]"
 
     categories = categorize_files(changes)
 
@@ -271,7 +271,9 @@ def generate_flowchart(
     lines.append("    end")
     lines.append("")
 
-    return "```mermaid\n" + "\n".join(lines) + "\n```"
+    # Return raw Mermaid content without code fences
+    # The PR template will wrap it in fences
+    return "\n".join(lines)
 
 
 def generate_summary_diagram(changes: List[FileChange]) -> str:
@@ -300,7 +302,8 @@ def generate_summary_diagram(changes: List[FileChange]) -> str:
     for cat, count in sorted(counts.items(), key=lambda x: -x[1]):
         lines.append(f'    "{cat.capitalize()}" : {count}')
 
-    return "```mermaid\n" + "\n".join(lines) + "\n```"
+    # Return raw Mermaid content without code fences
+    return "\n".join(lines)
 
 
 def generate_mermaid(

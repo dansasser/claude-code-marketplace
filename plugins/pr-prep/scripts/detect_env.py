@@ -23,8 +23,8 @@ def get_shell() -> str:
         shell = os.environ.get("SHELL", "")
         if "bash" in shell.lower():
             return "bash"
-        comspec = os.environ.get("COMSPEC", "")
-        if "powershell" in comspec.lower():
+        # PSModulePath is set in PowerShell sessions (more reliable than COMSPEC)
+        if os.environ.get("PSModulePath"):
             return "powershell"
         return "cmd"
     else:

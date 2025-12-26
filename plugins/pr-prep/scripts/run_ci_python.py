@@ -184,20 +184,30 @@ def run_pytest(project_dir: Path, test_dir: str = "tests") -> CheckResult:
     """Run pytest test suite."""
     name = "test (pytest)"
 
-    # Check if tests directory exists
+    # Check if tests directory exists and find the target directory
+    target_dir = None
     tests_path = project_dir / test_dir
-    if not tests_path.exists():
+    if tests_path.exists():
+        target_dir = test_dir
+    else:
         # Try alternatives
         for alt in ["test", "."]:
-            tests_path = project_dir / alt
-            if (tests_path / "test_*.py").parent.exists():
+            alt_path = project_dir / alt
+            if alt_path.exists() and list(alt_path.glob("test_*.py")):
+                target_dir = alt
                 break
 
+    # Build command with target directory if found
     cmd = ["pytest", "-v", "--tb=short"]
+    if target_dir:
+        cmd.append(target_dir)
+
     code, stdout, stderr, duration = run_command(cmd, cwd=project_dir, timeout=600)
 
     if code == 127:
         cmd = [sys.executable, "-m", "pytest", "-v", "--tb=short"]
+        if target_dir:
+            cmd.append(target_dir)
         code, stdout, stderr, duration = run_command(cmd, cwd=project_dir, timeout=600)
 
     return CheckResult(

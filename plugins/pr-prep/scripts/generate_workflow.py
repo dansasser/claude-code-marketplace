@@ -9,6 +9,7 @@ Uses ONLY Python stdlib for cross-platform compatibility.
 ALL file operations use pathlib/shutil, NEVER shell commands.
 """
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -78,7 +79,7 @@ def customize_python_workflow(content: str, project_dir: Path) -> str:
     if (project_dir / "poetry.lock").exists():
         content = content.replace(
             "pip install -e",
-            "pip install poetry && poetry install && pip install -e"
+            "pip install poetry && poetry install"
         )
 
     return content
@@ -112,7 +113,8 @@ def customize_node_workflow(content: str, project_dir: Path) -> str:
             "uses: actions/setup-node@v4",
             "uses: oven-sh/setup-bun@v1"
         )
-        content = content.replace('cache: "npm"', "")
+        # Remove entire cache line to avoid orphan YAML attribute
+        content = re.sub(r'\n\s*cache: "npm"', "", content)
         content = content.replace("npm ci", "bun install --frozen-lockfile")
         content = content.replace("npm run", "bun run")
         content = content.replace("npm test", "bun test")

@@ -173,7 +173,7 @@ def recover_node(
             return True, f"{msg}\n[OK] Cleaned build artifacts"
 
         elif error_type == ErrorType.CACHE_POISON:
-            # Clean npm/yarn/pnpm cache
+            # Clean npm/yarn/pnpm/bun cache
             msg = "[INFO] Detected cache corruption. Cleaning..."
             if package_manager == "npm":
                 subprocess.run(["npm", "cache", "clean", "--force"], check=True)
@@ -181,6 +181,8 @@ def recover_node(
                 subprocess.run(["yarn", "cache", "clean"], check=True)
             elif package_manager == "pnpm":
                 subprocess.run(["pnpm", "store", "prune"], check=True)
+            elif package_manager == "bun":
+                subprocess.run(["bun", "pm", "cache", "rm"], check=True)
 
             if node_modules.exists():
                 shutil.rmtree(node_modules)
@@ -295,10 +297,16 @@ def recover_python(
 
 
 def can_recover(error_type: ErrorType) -> bool:
-    """Check if this error type is potentially recoverable."""
+    """
+    Check if this error type is potentially recoverable.
+
+    Note: LOCK_DESYNC is included here for Node.js projects (recover_node handles it).
+    Python projects rarely have lock desync issues, so recover_python doesn't handle it,
+    but we still report it as potentially recoverable for completeness.
+    """
     return error_type in [
         ErrorType.DEP_CORRUPTION,
-        ErrorType.LOCK_DESYNC,
+        ErrorType.LOCK_DESYNC,  # Handled by recover_node, not recover_python
         ErrorType.STALE_ARTIFACTS,
         ErrorType.CACHE_POISON,
     ]

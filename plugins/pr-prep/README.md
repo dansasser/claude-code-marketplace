@@ -21,7 +21,7 @@ Takes any branch state (committed, uncommitted, unknown) and delivers a publishe
 ## Installation
 
 ```bash
-claude plugins install pr-prep
+/plugin install pr-prep
 ```
 
 ## Usage
