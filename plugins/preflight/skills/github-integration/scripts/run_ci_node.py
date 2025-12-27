@@ -440,7 +440,7 @@ def run_ci(
         checks.append(result)
         status = "[OK]" if result.passed else "[FAIL]"
         if "[SKIP]" in result.stdout:
-            print(f"  [SKIP] build (no script)")
+            print("  [SKIP] build (no script)")
         else:
             print(f"  {status} build ({result.duration:.1f}s)")
         if not result.passed:
@@ -455,7 +455,7 @@ def run_ci(
         checks.append(result)
         status = "[OK]" if result.passed else "[FAIL]"
         if "[SKIP]" in result.stdout:
-            print(f"  [SKIP] test (no script)")
+            print("  [SKIP] test (no script)")
         else:
             print(f"  {status} test ({result.duration:.1f}s)")
         if not result.passed:
