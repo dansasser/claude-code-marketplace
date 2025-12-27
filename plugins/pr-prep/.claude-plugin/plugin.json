@@ -22,26 +22,5 @@
     "testing",
     "mermaid",
     "cross-platform"
-  ],
-  "category": "Development Tools",
-  "agents": [
-    {
-      "name": "pr-prep-orchestrator",
-      "description": "Main orchestrator - coordinates all PR preparation phases from branch analysis to package publish"
-    },
-    {
-      "name": "pr-composer",
-      "description": "PR body generator with Mermaid diagrams and CI results formatting"
-    }
-  ],
-  "commands": [
-    {
-      "name": "prep-pr",
-      "description": "Full PR preparation pipeline: detect, validate, CI, commit, push, PR"
-    }
-  ],
-  "dependencies": {
-    "python": ">=3.10",
-    "tools": ["git"]
-  }
+  ]
 }
