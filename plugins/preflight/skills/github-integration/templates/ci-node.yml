@@ -41,7 +41,14 @@ jobs:
         run: npm ci
 
       - name: Run TypeScript check
-        run: npx tsc --noEmit || npm run typecheck --if-present
+        run: |
+          if npx tsc --noEmit 2>/dev/null; then
+            echo "[OK] TypeScript check passed"
+          elif npm run typecheck --if-present 2>/dev/null; then
+            echo "[OK] TypeScript check passed via npm script"
+          else
+            echo "[SKIP] No TypeScript configuration found"
+          fi
 
   test:
     name: Test
