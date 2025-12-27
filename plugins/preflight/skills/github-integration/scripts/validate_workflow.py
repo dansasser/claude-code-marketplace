@@ -95,7 +95,9 @@ def check_workflow_steps(content: str) -> Dict[str, bool]:
     ])
 
     has_test = any(pattern in content_lower for pattern in [
-        "pytest", "jest", "vitest", "mocha", "test", "npm test", "yarn test"
+        "pytest", "jest", "vitest", "mocha", "npm test", "yarn test",
+        "pnpm test", "bun test", "run test", "- test", "unittest",
+        "go test", "cargo test", "dotnet test", "phpunit"
     ])
 
     has_build = any(pattern in content_lower for pattern in [
