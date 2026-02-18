@@ -45,6 +45,32 @@
       },
       "keywords": ["pr", "pull-request", "ci", "automation", "mermaid", "github", "python", "nodejs", "error-recovery", "cross-platform"],
       "category": "development-tools"
+    },
+    {
+      "name": "coderabbit-pr-fixer",
+      "source": "./plugins/coderabbit-pr-fixer",
+      "description": "Auto-apply CodeRabbit AI review suggestions to a PR. Fetches the PR, extracts all individual AI fix prompts, applies each fix to the codebase, and commits/pushes the result.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Daniel T Sasser II",
+        "email": "contact@dansasser.me",
+        "url": "https://github.com/dansasser"
+      },
+      "keywords": ["coderabbit", "pr-review", "auto-fix", "code-review", "ai-review"],
+      "category": "productivity"
+    },
+    {
+      "name": "codex-pr-fixer",
+      "source": "./plugins/codex-pr-fixer",
+      "description": "Auto-apply OpenAI Codex review suggestions to a PR. Fetches the PR, extracts all Codex bot review comments with priority badges, applies each fix to the codebase, and commits/pushes the result.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Daniel T Sasser II",
+        "email": "contact@dansasser.me",
+        "url": "https://github.com/dansasser"
+      },
+      "keywords": ["codex", "openai", "pr-review", "auto-fix", "code-review", "ai-review"],
+      "category": "productivity"
     }
   ]
 }

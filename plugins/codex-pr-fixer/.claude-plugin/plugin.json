@@ -1,0 +1,5 @@
+{
+  "name": "codex-pr-fixer",
+  "version": "1.0.0",
+  "description": "Auto-apply OpenAI Codex PR review fixes"
+}

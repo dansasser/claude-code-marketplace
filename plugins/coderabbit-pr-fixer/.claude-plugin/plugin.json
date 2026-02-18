@@ -1,0 +1,5 @@
+{
+  "name": "coderabbit-pr-fixer",
+  "version": "1.0.0",
+  "description": "Auto-apply CodeRabbit PR review fixes from AI agent prompts"
+}
