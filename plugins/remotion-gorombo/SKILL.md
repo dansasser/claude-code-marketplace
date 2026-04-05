@@ -13,7 +13,10 @@ Use this skills whenever you are dealing with Remotion code to obtain the domain
 
 Before implementing any scenes, follow this sequence.
 
-**API keys** (ElevenLabs, Krea, etc.) are already configured in the project. Check existing scripts and .env files for how they're loaded before asking the user.
+**API keys** (ElevenLabs, Krea, etc.) are loaded from `.env` by the scripts automatically. NEVER pass API keys on the command line — they will be visible in terminal output. Always use the provided scripts:
+- `npx tsx src/YOUR_COMP/generate-voiceover.ts` — generates voiceover audio
+- `npx tsx src/generate-broll.ts --output "public/your-comp/broll/" --prompts prompts.json` — generates b-roll clips
+- `npx tsx src/YOUR_COMP/generate-captions.ts` — transcribes voiceover to captions
 
 ### Content safe zone (default)
 
