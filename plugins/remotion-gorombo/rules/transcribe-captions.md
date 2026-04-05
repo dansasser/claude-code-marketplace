@@ -62,7 +62,7 @@ const { captions } = toCaptions({
 });
 
 // Write it to the public/ folder so it can be fetched from Remotion
-fs.writeFileSync("captions123.json", JSON.stringify(captions, null, 2));
+fs.writeFileSync(path.join("public", "captions123.json"), JSON.stringify(captions, null, 2));
 ```
 
 Transcribe each clip individually and create multiple JSON files.

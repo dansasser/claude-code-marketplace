@@ -11,7 +11,7 @@ Use Mediabunny to extract frames from videos at specific timestamps. This is use
 
 ## The `extractFrames()` function
 
-This function can be copy-pasted into any project.
+This function requires TypeScript 5.2+ with `"lib": ["esnext.disposable"]` in tsconfig for `using` declarations. Chrome/Edge 134+, Firefox 141+.
 
 ```tsx
 import {
@@ -88,7 +88,7 @@ export async function extractFrames({
 
   for await (using videoSample of sink.samplesAtTimestamps(timestamps)) {
     if (signal?.aborted) {
-      break;
+      throw new Error("Aborted");
     }
 
     if (!videoSample) {
