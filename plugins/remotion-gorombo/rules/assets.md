@@ -38,19 +38,17 @@ import { Img, staticFile } from "remotion";
 **Videos:**
 
 ```tsx
-import { Video } from "@remotion/media";
-import { staticFile } from "remotion";
+import { OffthreadVideo, staticFile } from "remotion";
 
-<Video src={staticFile("clip.mp4")} />;
+<OffthreadVideo src={staticFile("clip.mp4")} />;
 ```
 
 **Audio:**
 
 ```tsx
-import { Audio } from "@remotion/media";
-import { staticFile } from "remotion";
+import { Html5Audio, staticFile } from "remotion";
 
-<Audio src={staticFile("music.mp3")} />;
+<Html5Audio src={staticFile("music.mp3")} />;
 ```
 
 **Fonts:**

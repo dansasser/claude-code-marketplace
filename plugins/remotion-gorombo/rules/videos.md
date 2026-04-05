@@ -38,7 +38,7 @@ Remote URLs are also supported:
 
 ## Trimming
 
-Use `trimBefore` and `trimAfter` to remove portions of the video. Values are in seconds.
+Use `trimBefore` and `trimAfter` to remove portions of the video. Values are in frames. To specify a time in seconds, multiply by the frame rate (e.g., `trimBefore={2 * fps}` for 2 seconds).
 
 ```tsx
 const { fps } = useVideoConfig();

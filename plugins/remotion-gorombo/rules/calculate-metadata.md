@@ -132,3 +132,6 @@ All fields are optional. Returned values override the `<Composition>` props:
 - `props`: Transformed props passed to the component
 - `defaultOutName`: Default output filename
 - `defaultCodec`: Default codec for rendering
+- `defaultVideoImageFormat`: Default image format for video frames (e.g., `"png"` for transparency)
+- `defaultPixelFormat`: Default pixel format (e.g., `"yuva444p10le"` for ProRes with alpha)
+- `defaultProResProfile`: Default ProRes profile (e.g., `"4444"` for transparency support)

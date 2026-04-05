@@ -192,7 +192,9 @@ const minDb = -100;
 const maxDb = -30;
 
 const scaled = frequencies.map((value) => {
-  const db = 20 * Math.log10(value);
+  const safe = Math.max(value, 1e-6);
+  const db = 20 * Math.log10(safe);
+  if (maxDb === minDb) return 0;
   return (db - minDb) / (maxDb - minDb);
 });
 ```

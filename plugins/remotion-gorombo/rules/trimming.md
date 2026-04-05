@@ -14,11 +14,14 @@ A negative `from` value shifts time backwards, making the animation start partwa
 ```tsx
 import { Sequence, useVideoConfig } from "remotion";
 
-const fps = useVideoConfig();
-
-<Sequence from={-0.5 * fps}>
-  <MyAnimation />
-</Sequence>;
+const TrimExample = () => {
+  const { fps } = useVideoConfig();
+  return (
+    <Sequence from={-0.5 * fps}>
+      <MyAnimation />
+    </Sequence>
+  );
+};
 ```
 
 The animation appears 15 frames into its progress - the first 15 frames are trimmed off.

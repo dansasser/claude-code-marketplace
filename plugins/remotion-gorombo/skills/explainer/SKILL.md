@@ -1,6 +1,6 @@
 ---
 name: explainer
-description: Create an educational explainer video that teaches a topic in 5 animated scenes with voiceover, b-roll, and captions.
+description: Create an educational explainer video that teaches a topic in 5 animated scenes with voiceover, animated visuals, and captions.
 user-invocable: true
 argument-hint: [topic or URL]
 ---
@@ -32,7 +32,8 @@ Write a 5-scene script. Present it for approval before building. Each scene need
 - **Scene 5:** CTA — what to do next, link on screen
 
 ## Visual Approach
-- SVG-based diagrams and icons (no external image assets)
+- SVG-based diagrams and icons for primary visuals.
+- If b-roll is used, treat it as a background layer that supports (not replaces) the core diagram-driven explanation.
 - Diagrams draw themselves (stroke-dashoffset animation)
 - Key numbers use count-up animation
 - Each scene has a clear visual metaphor — not walls of text
