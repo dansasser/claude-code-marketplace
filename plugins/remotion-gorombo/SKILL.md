@@ -46,6 +46,11 @@ Each composition gets its own directories:
 ### Step 2: Voiceover
 All videos should have voiceover. Write the voiceover script per scene first, generate audio via ElevenLabs, then use the audio durations to drive scene lengths (not the other way around). Load [./rules/voiceover.md](./rules/voiceover.md) for generation and dynamic duration details.
 
+When presenting the script for approval, ALWAYS show for every scene:
+- Headline (what appears on screen)
+- Voiceover (exact words the narrator says)
+- Visual description
+
 ### Step 3: B-roll
 Decide which scenes get b-roll backgrounds. Allocate ~2 b-roll clips per 30 seconds of video. Any scene can have b-roll — it's a background layer independent of the foreground content (text, charts, animated diagrams, anything). Load [./rules/b-roll.md](./rules/b-roll.md) for generation, zoom effects, and layering details.
 
