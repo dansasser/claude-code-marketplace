@@ -1,6 +1,6 @@
 # Claude Code Marketplace - Daniel T Sasser II
 
-Claude Code plugins for ollama integration, AI-assisted development, Python/Node.js CI/CD automation, and package quality assurance.
+Claude Code plugins for ollama integration, AI-assisted development, Python/Node.js CI/CD automation, AI video production, and package quality assurance.
 
 ## Available Plugins
 
@@ -86,6 +86,37 @@ Automated PR preparation with local CI validation, smart error recovery, and Mer
 
 [Full Documentation](./plugins/pr-prep/README.md)
 
+---
+
+### remotion-gorombo
+
+AI video production pipeline using Remotion. Turns simple prompts into fully produced short-form videos with voiceover, b-roll, animated captions, and YouTube upload.
+
+**Features:**
+- 7-step production pipeline (composition → voiceover → b-roll → transitions → captions → preview)
+- 7 prompt templates as slash commands
+- B-roll generation via Krea.ai with Ken Burns zoom
+- Voiceover via ElevenLabs TTS
+- Animated captions via Whisper with word highlighting
+- YouTube upload with full metadata
+- Google Drive delivery
+- Cross-platform safe zones (TikTok, Reels, Shorts)
+
+**Commands:**
+- `/remotion-gorombo:explainer [topic]` - Teach a topic in 5 scenes
+- `/remotion-gorombo:product-promo [URL]` - Promote a product/service
+- `/remotion-gorombo:data-visualization [CSV]` - Animate data as dashboard
+- `/remotion-gorombo:research-report [topic]` - Research + visualize stats
+- `/remotion-gorombo:testimonial [business]` - Social proof from reviews
+- `/remotion-gorombo:blog-promo [URL]` - Tease a blog post
+- `/remotion-gorombo:before-after [URL]` - Old way vs new way
+
+**Version:** 1.0.0
+**Category:** Content Creation
+**License:** MIT
+
+---
+
 ## Installation
 
 ### Add This Marketplace to Claude Code
@@ -169,15 +200,36 @@ claude-code-marketplace/
     │   ├── CLAUDE.md          # Governance rules
     │   └── README.md
     │
-    └── pr-prep/               # PR preparation pipeline
+    ├── pr-prep/               # PR preparation pipeline
+    │   ├── .claude-plugin/
+    │   │   └── plugin.json
+    │   ├── agents/            # Orchestrator + composer
+    │   ├── commands/          # /prep-pr command
+    │   ├── scripts/           # Python helper scripts
+    │   ├── templates/         # CI workflow templates
+    │   └── README.md
+    │
+    └── remotion-gorombo/      # AI video production
         ├── .claude-plugin/
         │   └── plugin.json
-        ├── agents/            # Orchestrator + composer
-        ├── commands/          # /prep-pr command
-        ├── scripts/           # Python helper scripts
-        ├── templates/         # CI workflow templates
-        └── README.md
+        ├── SKILL.md           # Production pipeline
+        ├── rules/             # 39 Remotion best-practice rules
+        └── skills/            # 7 prompt templates
+            ├── explainer/
+            ├── product-promo/
+            ├── data-visualization/
+            ├── research-report/
+            ├── testimonial/
+            ├── blog-promo/
+            └── before-after/
 ```
+
+**For remotion-gorombo:**
+1. Remotion 4.x (`npx create-video@latest`)
+2. ElevenLabs API key (voiceover)
+3. Krea.ai API key (b-roll generation)
+4. ffmpeg (clip extension)
+5. Optional: `gws` CLI (Google Drive upload), YouTube Data API v3 (YouTube upload)
 
 ## Contributing
 

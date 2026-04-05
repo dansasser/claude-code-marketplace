@@ -71,6 +71,19 @@
       },
       "keywords": ["codex", "openai", "pr-review", "auto-fix", "code-review", "ai-review"],
       "category": "productivity"
+    },
+    {
+      "name": "remotion-gorombo",
+      "source": "./plugins/remotion-gorombo",
+      "description": "AI video production pipeline using Remotion. 7 prompt templates for explainers, promos, dashboards, testimonials, and more. Includes voiceover (ElevenLabs), b-roll (Krea.ai), animated captions (Whisper), and YouTube upload.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Daniel T Sasser II",
+        "email": "contact@dansasser.me",
+        "url": "https://github.com/dansasser"
+      },
+      "keywords": ["remotion", "video", "youtube", "shorts", "tiktok", "reels", "voiceover", "b-roll", "captions", "krea", "elevenlabs", "whisper"],
+      "category": "content-creation"
     }
   ]
 }
