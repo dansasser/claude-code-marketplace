@@ -39,6 +39,8 @@ Platform UI is updated frequently — these values are current as of early 2026.
 
 **Landscape (16:9):** Full frame is usable, no safe zone restriction.
 
+**First frame rule:** Scene 1's first animation must start at frame 0 with no delay. Any delay creates a blank first frame which looks broken as a thumbnail and on autoplay.
+
 ### Step 1: Composition structure
 Each composition gets its own directories:
 - `public/<name>/voiceover/` — audio files
