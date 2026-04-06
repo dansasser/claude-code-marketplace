@@ -111,9 +111,11 @@ AI video production pipeline using Remotion. Turns simple prompts into fully pro
 - `/remotion-gorombo:blog-promo [URL]` - Tease a blog post
 - `/remotion-gorombo:before-after [URL]` - Old way vs new way
 
-**Version:** 1.0.0
+**Version:** 1.3.0
 **Category:** Content Creation
 **License:** MIT
+
+[Full Documentation](./plugins/remotion-gorombo/README.md)
 
 ---
 
