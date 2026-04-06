@@ -39,7 +39,7 @@ Platform UI is updated frequently — these values are current as of early 2026.
 
 **Landscape (16:9):** Full frame is usable, no safe zone restriction.
 
-**First frame rule:** Scene 1's first animation must start at frame 0 with no delay. Any delay creates a blank first frame which looks broken as a thumbnail and on autoplay.
+**First frame rule:** Scene 1's first animation must start at frame 0 with no delay AND start at visible values (e.g. scale 0.8, opacity 0.5). Spring animations start from 0 and take several frames to reach visible values — if starting from scale 0 or opacity 0, the first frames are blank which looks broken as a thumbnail and on autoplay.
 
 ### Step 1: Composition structure
 Each composition gets its own directories:
