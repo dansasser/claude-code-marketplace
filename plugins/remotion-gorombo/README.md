@@ -157,6 +157,8 @@ A typical 30-second video uses 2-4 b-roll clips. At the Pro plan, that's roughly
 
 For $10-15 more than Opus Agent, you get AI-generated **video** b-roll (not stock footage), full code control, pixel-level precision, and the ability to automate production for faceless channels.
 
+The extra cost also gets you **full platform access** beyond this plugin — Krea Pro includes image generation, upscaling, real-time canvas, and LoRA training. ElevenLabs Starter gives you voiceover/TTS for any project. You're paying for creative tools, not just a video maker.
+
 ## Content Safe Zones
 
 All content defaults to portrait (9:16) with cross-platform safe zones:
