@@ -76,7 +76,7 @@
       "name": "remotion-gorombo",
       "source": "./plugins/remotion-gorombo",
       "description": "AI video production pipeline using Remotion. 7 prompt templates for explainers, promos, dashboards, testimonials, and more. Includes voiceover (ElevenLabs), b-roll (Krea.ai), animated captions (Whisper), and YouTube upload.",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "author": {
         "name": "Daniel T Sasser II",
         "email": "contact@dansasser.me",
