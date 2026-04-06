@@ -125,6 +125,38 @@ The default model (Kling 2.5) uses ~550 compute units per clip.
 
 A typical 30-second video uses 2-4 b-roll clips. At the Pro plan, that's roughly 12 productions per month.
 
+## How We Compare — remotion-gorombo vs Opus Agent
+
+| | **Opus Agent Pro** | **remotion-gorombo** |
+|---|---|---|
+| **Monthly cost** | $29/mo | $39/mo (Krea) + $0-5/mo (ElevenLabs) |
+| **B-roll type** | Stock footage (Pexels) + AI stills | **AI-generated video** + Ken Burns zoom |
+| **Captions** | Included (animated) | Included (Whisper, free, unlimited, local) |
+| **Voiceover** | Included | ElevenLabs (free tier ~12 videos, $5/mo for 30+) |
+| **Productions/mo** | 15-30 | ~12 with video b-roll, ~1,300 with image b-roll |
+| **Model choice** | No | Yes — Kling, Veo, Seedance, Runway (quality/speed/cost tradeoffs) |
+| **Creative control** | Template-based, limited adjustment | Full React/TSX — pixel-level precision |
+| **Interactive editing** | Limited post-generation tweaks | Live preview, adjust scenes, move elements, iterate with AI |
+| **Captions proofreading** | Automated only | AI + human review before render |
+| **Custom scenes** | No | Unlimited — code anything React can render |
+| **Multi-platform post** | TikTok, Reels, Shorts, LinkedIn, X | YouTube + Drive (extensible) |
+| **Source control** | No | Git repo, full version history |
+| **Automation** | No | Heartbeat/cron for faceless channels |
+| **Ownership** | SaaS — their platform | Self-hosted — your code, your data |
+
+### Cost Breakdown
+
+| Component | Free path | Full path |
+|---|---|---|
+| Krea Pro (b-roll) | $39/mo | $39/mo |
+| ElevenLabs (voiceover) | $0 (free tier, ~10 min/mo) | $5/mo (Starter, 30 min/mo) |
+| Whisper (captions) | $0 (local) | $0 (local) |
+| Rendering | $0 (local) | $0 (local) |
+| YouTube/Drive upload | $0 | $0 |
+| **Total** | **$39/mo** | **$44/mo** |
+
+For $10-15 more than Opus Agent, you get AI-generated **video** b-roll (not stock footage), full code control, pixel-level precision, and the ability to automate production for faceless channels.
+
 ## Content Safe Zones
 
 All content defaults to portrait (9:16) with cross-platform safe zones:
