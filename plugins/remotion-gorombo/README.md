@@ -182,6 +182,32 @@ Safe area: **900x1400px centered** in 1080x1920 canvas. B-roll and backgrounds f
 - **B-roll is independent:** any scene can have b-roll regardless of foreground content
 - **Emoji on Linux:** Install `fonts-noto-color-emoji` or emojis render as blank boxes
 
+## Other Plugins in This Marketplace
+
+- **[claude-ollama-agents](../claude-ollama-agents/README.md)** — Multi-agent system for delegating tasks to local Ollama models. Saves 70%+ context budget.
+- **[preflight](../preflight/README.md)** — 8-gate CI/CD pipeline for Python packages. Cross-platform, multi-version, security scanning.
+- **[pr-prep](../pr-prep/README.md)** — Automated PR preparation with local CI validation and smart error recovery.
+- **[coderabbit-pr-fixer](../coderabbit-pr-fixer/README.md)** — Auto-apply CodeRabbit AI review suggestions to PRs.
+- **[codex-pr-fixer](../codex-pr-fixer/README.md)** — Auto-apply OpenAI Codex review suggestions to PRs.
+
+## References
+
+- [Remotion Documentation](https://remotion.dev/docs)
+- [Krea.ai API](https://docs.krea.ai)
+- [ElevenLabs API](https://elevenlabs.io/docs)
+- [YouTube Data API v3](https://developers.google.com/youtube/v3)
+- [Google Workspace CLI](https://github.com/googleworkspace/cli)
+- [Whisper.cpp](https://github.com/ggerganov/whisper.cpp)
+
+## Contact
+
+Built and maintained by **Daniel T Sasser II** at [Gorombo](https://gorombo.com).
+
+- **Website:** [gorombo.com](https://gorombo.com)
+- **Email:** [contact@gorombo.com](mailto:contact@gorombo.com)
+- **GitHub:** [github.com/dansasser](https://github.com/dansasser)
+- **Marketplace:** [dansasser/claude-code-marketplace](https://github.com/dansasser/claude-code-marketplace)
+
 ## License
 
 MIT
