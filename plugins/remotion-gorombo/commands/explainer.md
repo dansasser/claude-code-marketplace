@@ -6,7 +6,7 @@ Create an educational explainer video that teaches a topic in 5 animated scenes 
 
 **Examples:**
 - `/explainer How DNS works`
-- `/explainer https://gorombo.com/managed-ai`
-- `/explainer What is OpenClaw`
+- `/explainer https://example.com/my-product`
+- `/explainer What is machine learning`
 
 Invokes the `remotion-gorombo:explainer` skill with the provided arguments.

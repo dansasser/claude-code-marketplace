@@ -37,7 +37,7 @@ def to_kebab(name):
 
 def write_file(path, content):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(content)
     print(f"  created {os.path.relpath(path)}")
 
@@ -357,7 +357,7 @@ import {{ loadEnv }} from "../load-env";
 
 loadEnv();
 const API_KEY = process.env.ELEVENLABS_API_KEY!;
-const VOICE_ID = "nPczCjzI2devNBz1zQrb"; // Brian
+const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "nPczCjzI2devNBz1zQrb"; // Set ELEVENLABS_VOICE_ID in .env
 
 // Read scenes from project.json — single source of truth
 const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), "project.json");
@@ -739,11 +739,14 @@ export const {name}: React.FC<{name}Props> = ({{
         calculateMetadata={{calculate{name}Metadata}}
       />'''
 
-            root_content = root_content.replace("    </>", comp_entry + "\n    </>")
+            if "    </>" not in root_content:
+                print("Warning: Could not find </> closing tag in Root.tsx — skipping registration", file=sys.stderr)
+            else:
+                root_content = root_content.replace("    </>", comp_entry + "\n    </>")
 
-            with open(root_path, "w") as f:
-                f.write(root_content)
-            print(f"  registered in src/Root.tsx")
+                with open(root_path, "w", encoding="utf-8", newline="\n") as f:
+                    f.write(root_content)
+                print(f"  registered in src/Root.tsx")
 
     print(f"\nScaffold complete! Open Remotion Studio to preview.")
 
@@ -753,8 +756,8 @@ def main():
     parser.add_argument("name", help="Composition name in PascalCase (e.g. ManagedAiPromo)")
     args = parser.parse_args()
 
-    if not args.name[0].isupper():
-        print("Error: Composition name must be PascalCase (start with uppercase).", file=sys.stderr)
+    if not re.match(r'^[A-Z][a-zA-Z0-9]+$', args.name):
+        print("Error: Composition name must be PascalCase (e.g. MyVideo). Letters and numbers only, start with uppercase.", file=sys.stderr)
         sys.exit(1)
 
     scaffold(args.name)

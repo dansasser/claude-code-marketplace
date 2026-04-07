@@ -70,6 +70,8 @@ After the script, ask the user:
 - Auto-render when complete? (defaults to no)
 - Auto-publish to YouTube? (defaults to no)
 
+Use these exact values in project.json: `"render"` and `"youtube_publish"` must be `"pending"` (wait for approval) or `"approved"` (auto-proceed). After render completes, set `"render"` to `"completed"`. Do not use booleans or yes/no.
+
 **Update project.json:** Fill in each scene's `headline`, `voiceover`, and `visual` fields. Update `background_music`, `render`, and `youtube_publish` with the user's answers. If the scene count changed, duplicate scene entries in the `scenes` array to match. Also duplicate the placeholder Scene1.tsx for each additional scene and update index.tsx to import and wire them all into the TransitionSeries.
 
 ### Step 3: Voiceover generation
@@ -128,7 +130,7 @@ If `render` is "approved" in project.json, render automatically when all scenes 
 npx remotion render <CompositionId> out/<name>.mp4 --port 3100
 ```
 
-After render completes, upload to Google Drive automatically (default delivery). If `youtube_publish` is "approved" in project.json, generate a YouTube description from the voiceover text (include links to gorombo.com and facebook.com/danielsasserii) and upload via `python3 youtube-upload.py`.
+After render completes, upload to Google Drive automatically (default delivery). If `youtube_publish` is "approved" in project.json, generate a YouTube description from the voiceover text and upload via `python3 youtube-upload.py`. Include any links the user has configured in their project or .env.
 
 **Update project.json:** Set `render` to "completed" after successful render.
 

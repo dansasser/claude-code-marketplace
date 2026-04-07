@@ -5,7 +5,7 @@ Create a testimonial video by pulling real reviews from Google Maps, Facebook, Y
 **Usage:** `/testimonial <business name or URL>`
 
 **Examples:**
-- `/testimonial "Gorombo LLC"`
-- `/testimonial https://gorombo.com`
+- `/testimonial "My Business Name"`
+- `/testimonial https://example.com`
 
 Invokes the `remotion-gorombo:testimonial` skill with the provided arguments.
