@@ -49,7 +49,7 @@ python3 scripts/scaffold.py <CompositionName>
 ```
 
 This automatically creates the full composition structure:
-- `src/<Name>/` — index.tsx, Scene1.tsx (placeholder), get-audio-duration.ts, generate-voiceover.ts (empty SCENES), generate-captions.ts (empty SCENES), Captions.tsx, project.json
+- `src/<Name>/` — index.tsx, Scene1.tsx (placeholder), get-audio-duration.ts, generate-voiceover.ts (reads scenes from project.json), generate-captions.ts (reads scenes from project.json), Captions.tsx, project.json
 - `public/<name>/voiceover/`, `public/<name>/broll/`, `public/<name>/captions/`
 - Registers the composition in `src/Root.tsx`
 
