@@ -73,7 +73,7 @@ After the script, ask the user:
 **Update project.json:** Fill in each scene's `headline`, `voiceover`, and `visual` fields. Update `background_music`, `render`, and `youtube_publish` with the user's answers. If the scene count changed, duplicate scene entries in the `scenes` array to match. Also duplicate the placeholder Scene1.tsx for each additional scene and update index.tsx to import and wire them all into the TransitionSeries.
 
 ### Step 3: Voiceover generation
-Fill in the SCENES array in `generate-voiceover.ts` with the approved voiceover text, then run:
+The voiceover script reads directly from `project.json` — no need to edit the script itself. Just make sure the voiceover text is filled in for each scene in project.json (Step 2), then run:
 
 ```bash
 npx tsx src/<Name>/generate-voiceover.ts

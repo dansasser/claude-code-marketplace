@@ -351,7 +351,7 @@ export const Captions: React.FC<{ captionFile: string }> = ({
 ''')
 
     # --- generate-voiceover.ts ---
-    write_file(os.path.join(src_dir, "generate-voiceover.ts"), f'''import {{ writeFileSync, mkdirSync, existsSync }} from "fs";
+    write_file(os.path.join(src_dir, "generate-voiceover.ts"), f'''import {{ writeFileSync, mkdirSync, existsSync, readFileSync }} from "fs";
 import path from "path";
 import {{ loadEnv }} from "../load-env";
 
@@ -359,10 +359,12 @@ loadEnv();
 const API_KEY = process.env.ELEVENLABS_API_KEY!;
 const VOICE_ID = "nPczCjzI2devNBz1zQrb"; // Brian
 
-const SCENES: {{ id: string; text: string }}[] = [
-  // Fill in scene voiceover text here
-  // {{ id: "scene-01", text: "Your voiceover text..." }},
-];
+// Read scenes from project.json — single source of truth
+const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), "project.json");
+const project = JSON.parse(readFileSync(PROJECT_FILE, "utf-8"));
+const SCENES = project.scenes
+  .filter((s: {{ voiceover: string }}) => s.voiceover)
+  .map((s: {{ id: string; voiceover: string }}) => ({{ id: s.id, text: s.voiceover }}));
 
 const OUTPUT_DIR = path.join("public", "{kebab}", "voiceover");
 
@@ -408,7 +410,7 @@ async function main() {{
   }}
 
   if (SCENES.length === 0) {{
-    console.error("No scenes defined. Fill in the SCENES array first.");
+    console.error("No scenes with voiceover text found in project.json");
     process.exit(1);
   }}
 
@@ -445,14 +447,14 @@ const WHISPER_DIR = path.join(PROJECT_DIR, "whisper.cpp");
 const VOICEOVER_DIR = path.join(PROJECT_DIR, "public", "{kebab}", "voiceover");
 const CAPTIONS_DIR = path.join(PROJECT_DIR, "public", "{kebab}", "captions");
 
-const SCENES: string[] = [
-  // Fill in scene IDs here (must match voiceover filenames)
-  // "scene-01", "scene-02", "scene-03",
-];
+// Read scene IDs from project.json — single source of truth
+const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), "project.json");
+const project = JSON.parse(fs.readFileSync(PROJECT_FILE, "utf-8"));
+const SCENES: string[] = project.scenes.map((s: {{ id: string }}) => s.id);
 
 async function main() {{
   if (SCENES.length === 0) {{
-    console.error("No scenes defined. Fill in the SCENES array first.");
+    console.error("No scenes found in project.json");
     process.exit(1);
   }}
 
