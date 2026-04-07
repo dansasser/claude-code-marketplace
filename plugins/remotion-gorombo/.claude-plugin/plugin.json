@@ -1,6 +1,6 @@
 {
   "name": "remotion-gorombo",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "AI video production pipeline using Remotion. Generate promotional videos, explainers, data dashboards, testimonials, and more from simple prompts. Includes voiceover (ElevenLabs), b-roll (Krea.ai), animated captions (Whisper), and YouTube upload.",
   "author": {
     "name": "Daniel T Sasser II",

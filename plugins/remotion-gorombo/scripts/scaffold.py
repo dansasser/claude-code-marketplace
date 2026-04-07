@@ -519,11 +519,106 @@ main().catch((err) => {{
 }});
 ''')
 
+    # --- generate-background-music.ts ---
+    write_file(os.path.join(src_dir, "generate-background-music.ts"), f'''import {{ writeFileSync, mkdirSync, existsSync, readFileSync, readdirSync }} from "fs";
+import path from "path";
+import {{ loadEnv }} from "../load-env";
+import {{ getAudioDuration }} from "./get-audio-duration";
+import {{ staticFile }} from "remotion";
+
+loadEnv();
+const API_KEY = process.env.ELEVENLABS_API_KEY!;
+
+// Read background music config from project.json
+const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), "project.json");
+const project = JSON.parse(readFileSync(PROJECT_FILE, "utf-8"));
+
+const VOICEOVER_DIR = path.join("public", "{kebab}", "voiceover");
+const OUTPUT_PATH = path.join("public", "{kebab}", "background-music.mp3");
+
+const MOOD_PROMPTS: Record<string, string> = {{
+  upbeat: "upbeat corporate background music, energetic but not overpowering, modern and clean",
+  corporate: "soft corporate background music, professional and clean, subtle piano and light percussion",
+  cinematic: "cinematic background music, dramatic and emotional, orchestral strings and atmosphere",
+  ambient: "soft ambient background music, gentle and atmospheric, minimal and calming",
+}};
+
+async function getTotalDuration(): Promise<number> {{
+  const files = readdirSync(VOICEOVER_DIR).filter((f) => f.endsWith(".mp3"));
+  if (files.length === 0) {{
+    throw new Error("No voiceover files found. Generate voiceover first.");
+  }}
+  let total = 0;
+  for (const file of files) {{
+    const duration = await getAudioDuration(staticFile(`{kebab}/voiceover/${{file}}`));
+    total += duration;
+  }}
+  return total;
+}}
+
+async function main() {{
+  if (!API_KEY) {{
+    console.error("ELEVENLABS_API_KEY not set");
+    process.exit(1);
+  }}
+
+  if (!project.background_music?.enabled) {{
+    console.log("Background music disabled in project.json — skipping.");
+    process.exit(0);
+  }}
+
+  const mood = project.background_music.mood || "ambient";
+  const prompt = MOOD_PROMPTS[mood] || mood;
+
+  console.log(`Generating background music (mood: ${{mood}})...`);
+
+  const totalDuration = await getTotalDuration();
+  const durationMs = Math.ceil(totalDuration * 1000);
+
+  console.log(`  Total voiceover duration: ${{totalDuration.toFixed(1)}}s → music: ${{durationMs}}ms`);
+
+  const response = await fetch("https://api.elevenlabs.io/v1/music?output_format=mp3_44100_128", {{
+    method: "POST",
+    headers: {{
+      "xi-api-key": API_KEY,
+      "Content-Type": "application/json",
+    }},
+    body: JSON.stringify({{
+      prompt,
+      music_length_ms: durationMs,
+      force_instrumental: true,
+    }}),
+  }});
+
+  if (!response.ok) {{
+    const err = await response.text();
+    throw new Error(`ElevenLabs Music API error: ${{response.status}} ${{err}}`);
+  }}
+
+  const audioBuffer = Buffer.from(await response.arrayBuffer());
+
+  const outputDir = path.dirname(OUTPUT_PATH);
+  if (!existsSync(outputDir)) {{
+    mkdirSync(outputDir, {{ recursive: true }});
+  }}
+
+  writeFileSync(OUTPUT_PATH, audioBuffer);
+  console.log(`  → ${{OUTPUT_PATH}} (${{(audioBuffer.length / 1024).toFixed(1)}} KB)`);
+  console.log("\\nBackground music generated!");
+}}
+
+main().catch((err) => {{
+  console.error(err);
+  process.exit(1);
+}});
+''')
+
     # --- index.tsx ---
     write_file(os.path.join(src_dir, "index.tsx"), f'''import {{ TransitionSeries, linearTiming }} from "@remotion/transitions";
 import {{ fade }} from "@remotion/transitions/fade";
+import {{ Audio }} from "@remotion/media";
 import {{ loadFont }} from "@remotion/google-fonts/Inter";
-import {{ CalculateMetadataFunction }} from "remotion";
+import {{ AbsoluteFill, CalculateMetadataFunction, staticFile }} from "remotion";
 import {{ Scene1 }} from "./Scene1";
 
 loadFont("normal", {{ weights: ["400", "600", "800"], subsets: ["latin"] }});
@@ -531,9 +626,12 @@ loadFont("normal", {{ weights: ["400", "600", "800"], subsets: ["latin"] }});
 const FPS = 30;
 const TRANSITION_DURATION = 36; // 1.2 seconds
 const DEFAULT_SCENE_DURATION = 150; // 5 seconds placeholder
+const BACKGROUND_MUSIC_FILE = "{kebab}/background-music.mp3";
+const BACKGROUND_MUSIC_VOLUME = 0.15;
 
 export type {name}Props = {{
   scene1Duration: number;
+  hasBackgroundMusic: boolean;
 }};
 
 export const calculate{name}Metadata: CalculateMetadataFunction<
@@ -549,15 +647,25 @@ export const calculate{name}Metadata: CalculateMetadataFunction<
 
 export const {name}: React.FC<{name}Props> = ({{
   scene1Duration,
+  hasBackgroundMusic,
 }}) => {{
   return (
-    <TransitionSeries>
-      <TransitionSeries.Sequence durationInFrames={{scene1Duration}}>
-        <Scene1 />
-      </TransitionSeries.Sequence>
+    <AbsoluteFill>
+      <TransitionSeries>
+        <TransitionSeries.Sequence durationInFrames={{scene1Duration}}>
+          <Scene1 />
+        </TransitionSeries.Sequence>
 
-      {{/* Additional scenes and transitions will be added here */}}
-    </TransitionSeries>
+        {{/* Additional scenes and transitions will be added here */}}
+      </TransitionSeries>
+
+      {{hasBackgroundMusic && (
+        <Audio
+          src={{staticFile(BACKGROUND_MUSIC_FILE)}}
+          volume={{BACKGROUND_MUSIC_VOLUME}}
+        />
+      )}}
+    </AbsoluteFill>
   );
 }};
 ''')
@@ -625,6 +733,7 @@ export const {name}: React.FC<{name}Props> = ({{
         defaultProps={{
           {{
             scene1Duration: 150,
+            hasBackgroundMusic: false,
           }} satisfies {name}Props
         }}
         calculateMetadata={{calculate{name}Metadata}}

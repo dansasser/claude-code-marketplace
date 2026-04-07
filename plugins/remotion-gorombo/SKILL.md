@@ -105,12 +105,23 @@ All videos should have animated subtitles with word highlighting. Follow this se
 
 Load [./rules/subtitles.md](./rules/subtitles.md) for technical details on the Caption type, transcription, and display components.
 
-### Step 7: Preview
+### Step 7: Background music
+If `background_music.enabled` is true in project.json, generate a background music track:
+
+```bash
+npx tsx src/<Name>/generate-background-music.ts
+```
+
+The script reads the mood from project.json, measures total voiceover duration, and generates an instrumental track via ElevenLabs Music API. The track saves to `public/<name>/background-music.mp3` and plays automatically in the composition at 15% volume. Set `hasBackgroundMusic: true` in the composition's defaultProps in Root.tsx.
+
+If background music is disabled, skip this step.
+
+### Step 8: Preview
 Launch Remotion Studio (`npx remotion studio`) if it isn't already running so the user can review in the browser.
 
 **Update project.json:** Set each completed scene's `status` to "coded".
 
-### Step 8: Render and deliver
+### Step 9: Render and deliver
 If `render` is "approved" in project.json, render automatically when all scenes are coded. Otherwise wait for user approval.
 
 ```bash
