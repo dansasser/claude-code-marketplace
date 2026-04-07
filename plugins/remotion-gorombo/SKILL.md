@@ -41,28 +41,55 @@ Platform UI is updated frequently — these values are current as of early 2026.
 
 **First frame rule:** Scene 1's first animation must start at frame 0 with no delay AND start at visible values (e.g. scale 0.8, opacity 0.5). Spring animations start from 0 and take several frames to reach visible values — if starting from scale 0 or opacity 0, the first frames are blank which looks broken as a thumbnail and on autoplay.
 
-### Step 1: Composition structure
-Each composition gets its own directories:
-- `public/<name>/voiceover/` — audio files
-- `public/<name>/broll/` — video clips
-- `public/<name>/captions/` — transcription JSON files
-- `src/<Name>/` — components, generate-voiceover.ts, generate-captions.ts
+### Step 1: Scaffold the composition
+Run the scaffold script from the Remotion project root:
 
-### Step 2: Voiceover
-All videos should have voiceover. Write the voiceover script per scene first, generate audio via ElevenLabs, then use the audio durations to drive scene lengths (not the other way around). Load [./rules/voiceover.md](./rules/voiceover.md) for generation and dynamic duration details.
+```bash
+python3 scripts/scaffold.py <CompositionName>
+```
+
+This automatically creates the full composition structure:
+- `src/<Name>/` — index.tsx, Scene1.tsx (placeholder), get-audio-duration.ts, generate-voiceover.ts (empty SCENES), generate-captions.ts (empty SCENES), Captions.tsx, project.json
+- `public/<name>/voiceover/`, `public/<name>/broll/`, `public/<name>/captions/`
+- Registers the composition in `src/Root.tsx`
+
+The composition is immediately previewable in Remotion Studio with a placeholder scene. Do NOT manually create these files — use the script.
+
+The scaffold also creates `project.json` in the composition directory. As you work through the following steps, update this file with the creative decisions (scene headlines, voiceover text, visual descriptions, b-roll choices, background music, render/publish approval status).
+
+### Step 2: Script and questionnaire
+Write the voiceover script per scene first. All videos should have voiceover — audio durations drive scene lengths (not the other way around).
 
 When presenting the script for approval, ALWAYS show for every scene:
 - Headline (what appears on screen)
 - Voiceover (exact words the narrator says)
 - Visual description
 
-### Step 3: B-roll
+After the script, ask the user:
+- Background music? (yes/no, mood: upbeat/corporate/cinematic/ambient)
+- Auto-render when complete? (defaults to no)
+- Auto-publish to YouTube? (defaults to no)
+
+**Update project.json:** Fill in each scene's `headline`, `voiceover`, and `visual` fields. Update `background_music`, `render`, and `youtube_publish` with the user's answers. If the scene count changed, duplicate scene entries in the `scenes` array to match. Also duplicate the placeholder Scene1.tsx for each additional scene and update index.tsx to import and wire them all into the TransitionSeries.
+
+### Step 3: Voiceover generation
+Fill in the SCENES array in `generate-voiceover.ts` with the approved voiceover text, then run:
+
+```bash
+npx tsx src/<Name>/generate-voiceover.ts
+```
+
+Load [./rules/voiceover.md](./rules/voiceover.md) for dynamic duration details and calculateMetadata patterns.
+
+### Step 4: B-roll
 Decide which scenes get b-roll backgrounds. Allocate ~2 b-roll clips per 30 seconds of video. Any scene can have b-roll — it's a background layer independent of the foreground content (text, charts, animated diagrams, anything). Load [./rules/b-roll.md](./rules/b-roll.md) for generation, zoom effects, and layering details.
 
-### Step 4: Transitions
-Use `fade()` transitions between scenes at 1-1.5 seconds (30-45 frames at 30fps). `PADDING_FRAMES` (silence after voiceover) MUST be >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer.
+**Update project.json:** For each scene, fill in `broll.type` ("image", "video", or "none") and `broll.prompt`.
 
-### Step 5: Captions
+### Step 5: Transitions
+The scaffold already sets up TransitionSeries with fade transitions. Use `fade()` between scenes at 1-1.5 seconds (30-45 frames at 30fps). `PADDING_FRAMES` (silence after voiceover) MUST be >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer.
+
+### Step 6: Captions
 All videos should have animated subtitles with word highlighting. Follow this sequence:
 
 1. **Transcribe** — Use whisper.cpp to transcribe each scene's voiceover audio to get word-level timestamps. Output to `public/<name>/captions/`.
@@ -78,8 +105,21 @@ All videos should have animated subtitles with word highlighting. Follow this se
 
 Load [./rules/subtitles.md](./rules/subtitles.md) for technical details on the Caption type, transcription, and display components.
 
-### Step 6: Preview
-Launch Remotion Studio (`npx remotion studio`) if it isn't already running so the user can review in the browser. Do not render or deliver unless the prompt or the user says to.
+### Step 7: Preview
+Launch Remotion Studio (`npx remotion studio`) if it isn't already running so the user can review in the browser.
+
+**Update project.json:** Set each completed scene's `status` to "coded".
+
+### Step 8: Render and deliver
+If `render` is "approved" in project.json, render automatically when all scenes are coded. Otherwise wait for user approval.
+
+```bash
+npx remotion render <CompositionId> out/<name>.mp4 --port 3100
+```
+
+After render completes, upload to Google Drive automatically (default delivery). If `youtube_publish` is "approved" in project.json, generate a YouTube description from the voiceover text (include links to gorombo.com and facebook.com/danielsasserii) and upload via `python3 youtube-upload.py`.
+
+**Update project.json:** Set `render` to "completed" after successful render.
 
 ## Using FFmpeg
 
