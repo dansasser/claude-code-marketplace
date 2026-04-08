@@ -5,7 +5,7 @@ Create a teaser video for a blog post that drives clicks to read the full articl
 **Usage:** `/blog-promo <blog post URL>`
 
 **Examples:**
-- `/blog-promo https://gorombo.com/blog/managed-ai-launch`
+- `/blog-promo https://example.com/blog/my-post`
 - `/blog-promo https://example.com/blog/my-post`
 
 Invokes the `remotion-gorombo:blog-promo` skill with the provided arguments.

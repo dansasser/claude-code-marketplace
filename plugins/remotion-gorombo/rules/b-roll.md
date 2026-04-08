@@ -87,12 +87,42 @@ const BRollScene: React.FC<{
           style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${zoom})` }}
         />
       </AbsoluteFill>
-      {/* Content on top */}
-      <AbsoluteFill>{children}</AbsoluteFill>
+      {/* Content on top — use safe zone padding and vertical centering */}
+      <AbsoluteFill
+        style={{
+          padding: "210px 120px 310px 60px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        {children}
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
 ```
+
+### Content over b-roll MUST have contrast
+
+Text and elements over b-roll need dark semi-transparent card backgrounds to be readable:
+
+```tsx
+<div
+  style={{
+    backgroundColor: "rgba(10, 10, 10, 0.7)",
+    border: "1.5px solid rgba(99, 102, 241, 0.4)",
+    borderRadius: 14,
+    padding: "16px 36px",
+  }}
+>
+  <span style={{ color: "white", fontSize: 32, fontWeight: 600, fontFamily: "Inter" }}>
+    Content text here
+  </span>
+</div>
+```
+
+Do NOT rely on text shadows alone — always use card backgrounds over b-roll.
 
 ### Critical: Zoom effect requirements
 

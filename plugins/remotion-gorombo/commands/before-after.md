@@ -5,7 +5,7 @@ Create a before/after comparison video showing the old way vs the new way. Drama
 **Usage:** `/before-after <URL or description>`
 
 **Examples:**
-- `/before-after https://gorombo.com/managed-ai`
+- `/before-after https://example.com/my-product`
 - `/before-after "hiring a VA vs using AI automation"`
 
 Invokes the `remotion-gorombo:before-after` skill with the provided arguments.
