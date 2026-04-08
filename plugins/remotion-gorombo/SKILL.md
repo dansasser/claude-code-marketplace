@@ -169,6 +169,8 @@ npx tsx src/<Name>/generate-background-music.ts
 
 The script reads the mood from project.json, measures total voiceover duration, and generates an instrumental track via ElevenLabs Music API. The track saves to `public/<name>/background-music.mp3` and plays automatically in the composition at 15% volume. Set `hasBackgroundMusic: true` in the composition's defaultProps in Root.tsx.
 
+**Duration note:** The music should cover the FULL video length including padding frames and transitions, not just the voiceover. Add extra seconds to the generated duration to account for this (typically 5-10 seconds beyond total voiceover).
+
 If background music is disabled, skip this step.
 
 ### Step 8: Preview
@@ -176,8 +178,22 @@ Remotion Studio should already be running from Step 1. If not, restart it with `
 
 **Update project.json:** Set each completed scene's `status` to "coded".
 
-### Step 9: Render and deliver
-If `render` is "approved" in project.json, render automatically when all scenes are coded. Otherwise wait for user approval.
+### Step 9: Pre-render checklist (MANDATORY)
+
+Before rendering, verify ALL of the following. Do NOT render until every item is confirmed:
+
+- [ ] All scenes coded and visually complete
+- [ ] Voiceover generated for all scenes (Step 3)
+- [ ] B-roll generated and composited for scenes that need it (Step 4)
+- [ ] Captions generated, proofread (brand name checked!), and wired into composition (Step 6)
+- [ ] Background music generated if enabled (Step 7), hasBackgroundMusic set to true in Root.tsx
+- [ ] Safe zone padding correct on all scenes
+- [ ] Content vertically centered, lists in centered blocks with left-aligned items
+
+If ANY step was skipped, go back and complete it before rendering.
+
+### Step 10: Render and deliver
+If `render` is "approved" in project.json, render automatically when all checklist items pass. Otherwise wait for user approval.
 
 ```bash
 npx remotion render <CompositionId> out/<name>.mp4 --port 3100
