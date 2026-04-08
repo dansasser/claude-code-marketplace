@@ -14,9 +14,10 @@ Use this skills whenever you are dealing with Remotion code to obtain the domain
 Before implementing any scenes, follow this sequence.
 
 **API keys** (ElevenLabs, Krea, etc.) are loaded from `.env` by the scripts automatically. NEVER pass API keys on the command line — they will be visible in terminal output. Always use the provided scripts:
-- `npx tsx src/YOUR_COMP/generate-voiceover.ts` — generates voiceover audio
-- `npx tsx src/generate-broll.ts --output "public/your-comp/broll/" --prompts prompts.json` — generates b-roll clips
-- `npx tsx src/YOUR_COMP/generate-captions.ts` — transcribes voiceover to captions
+- `npx tsx src/<Name>/generate-voiceover.ts` — generates voiceover audio (reads scenes from project.json)
+- `npx tsx src/<Name>/generate-captions.ts` — transcribes voiceover to captions (reads scene IDs from project.json)
+- `npx tsx src/<Name>/generate-background-music.ts` — generates background music (reads mood from project.json)
+- `npx tsx src/generate-broll.ts --output "public/<name>/broll/" --prompts prompts.json` — generates b-roll clips
 
 ### Content safe zone (default)
 
@@ -42,23 +43,29 @@ Platform UI is updated frequently — these values are current as of early 2026.
 **First frame rule:** Scene 1's first animation must start at frame 0 with no delay AND start at visible values (e.g. scale 0.8, opacity 0.5). Spring animations start from 0 and take several frames to reach visible values — if starting from scale 0 or opacity 0, the first frames are blank which looks broken as a thumbnail and on autoplay.
 
 ### Step 1: Scaffold the composition
-Run the scaffold script from the Remotion project root:
+Run the scaffold script from the Remotion project root. The script is located in the plugin's `scripts/` directory:
 
 ```bash
-python3 scripts/scaffold.py <CompositionName>
+python3 <path-to-plugin>/scripts/scaffold.py <CompositionName>
 ```
 
 This automatically creates the full composition structure:
-- `src/<Name>/` — index.tsx, Scene1.tsx (placeholder), get-audio-duration.ts, generate-voiceover.ts (reads scenes from project.json), generate-captions.ts (reads scenes from project.json), Captions.tsx, project.json
+- `src/<Name>/` — index.tsx, Scene1.tsx (placeholder), get-audio-duration.ts, generate-voiceover.ts, generate-captions.ts, generate-background-music.ts, Captions.tsx, project.json
 - `public/<name>/voiceover/`, `public/<name>/broll/`, `public/<name>/captions/`
 - Registers the composition in `src/Root.tsx`
 
-The composition is immediately previewable in Remotion Studio with a placeholder scene. Do NOT manually create these files — use the script.
+After scaffolding, **restart Remotion Studio** so it picks up the new composition:
 
-The scaffold also creates `project.json` in the composition directory. As you work through the following steps, update this file with the creative decisions (scene headlines, voiceover text, visual descriptions, b-roll choices, background music, render/publish approval status).
+```bash
+npx remotion studio
+```
+
+The placeholder scene is immediately previewable. Do NOT manually create these files — use the script.
+
+The scaffold creates `project.json` in the composition directory. This file is the **single source of truth** — all scripts read from it, and you update it at every step. Every creative decision, every configuration value, every approval status goes into this file.
 
 ### Step 2: Script and questionnaire
-Write the voiceover script per scene first. All videos should have voiceover — audio durations drive scene lengths (not the other way around).
+First, decide how many scenes the video needs (typically 3-5). Then write the voiceover script for all scenes. Audio durations drive scene lengths (not the other way around).
 
 When presenting the script for approval, ALWAYS show for every scene:
 - Headline (what appears on screen)
@@ -95,7 +102,7 @@ The voiceover script reads directly from `project.json` — no need to edit the 
 npx tsx src/<Name>/generate-voiceover.ts
 ```
 
-Load [./rules/voiceover.md](./rules/voiceover.md) for dynamic duration details and calculateMetadata patterns.
+After voiceover files are generated, **update `index.tsx`**: replace the placeholder `calculateMetadata` with one that reads actual audio durations using `getAudioDuration`. The composition duration should be driven by the voiceover audio, not hardcoded frame counts. Load [./rules/voiceover.md](./rules/voiceover.md) for the exact calculateMetadata pattern.
 
 ### Step 4: B-roll
 Decide which scenes get b-roll backgrounds. Allocate ~2 b-roll clips per 30 seconds of video. Any scene can have b-roll — it's a background layer independent of the foreground content (text, charts, animated diagrams, anything). Load [./rules/b-roll.md](./rules/b-roll.md) for generation, zoom effects, and layering details.
@@ -108,7 +115,13 @@ The scaffold already sets up TransitionSeries with fade transitions. Use `fade()
 ### Step 6: Captions
 All videos should have animated subtitles with word highlighting. Follow this sequence:
 
-1. **Transcribe** — Use whisper.cpp to transcribe each scene's voiceover audio to get word-level timestamps. Output to `public/<name>/captions/`.
+1. **Transcribe** — Run the captions script to transcribe voiceover audio with word-level timestamps:
+
+```bash
+npx tsx src/<Name>/generate-captions.ts
+```
+
+Output goes to `public/<name>/captions/`.
 2. **Proofread (MANDATORY)** — Whisper always mangles brand names, proper nouns, and punctuation. Before using transcripts:
    - Fix brand names — check `branding.company` in project.json and correct any misspellings Whisper introduced
    - Fix punctuation — add missing commas, periods
@@ -133,7 +146,7 @@ The script reads the mood from project.json, measures total voiceover duration, 
 If background music is disabled, skip this step.
 
 ### Step 8: Preview
-Launch Remotion Studio (`npx remotion studio`) if it isn't already running so the user can review in the browser.
+Remotion Studio should already be running from Step 1. If not, restart it with `npx remotion studio`. The user can review the video in the browser and request changes.
 
 **Update project.json:** Set each completed scene's `status` to "coded".
 
@@ -144,7 +157,7 @@ If `render` is "approved" in project.json, render automatically when all scenes 
 npx remotion render <CompositionId> out/<name>.mp4 --port 3100
 ```
 
-After render completes, upload to Google Drive automatically (default delivery).
+After render completes, upload to the user's configured delivery destination (e.g. Google Drive via `gws` CLI, or another tool). Ask the user where to deliver if not previously specified.
 
 If `youtube.publish` is "approved" in project.json, generate a YouTube description by:
 - Summarizing the voiceover text from project.json scenes
