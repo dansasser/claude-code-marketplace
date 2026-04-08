@@ -148,8 +148,8 @@ npx tsx src/<Name>/generate-captions.ts
 ```
 
 Output goes to `public/<name>/captions/`.
-2. **Proofread (MANDATORY)** — Whisper always mangles brand names, proper nouns, and punctuation. Before using transcripts:
-   - Fix brand names — check `branding.company` in project.json and correct any misspellings Whisper introduced
+2. **Proofread (MANDATORY — DO NOT SKIP)** — Whisper ALWAYS mangles brand names. This is not optional.
+   - **FIRST: Fix the brand name.** Read `branding.company` from project.json. Search every caption file for ANY misspelling of it — Whisper splits words into tokens so check for partial matches too (e.g. "Gar" + "ombo" instead of "Gorombo"). Merge split tokens and correct the spelling. This is the #1 priority.
    - Fix punctuation — add missing commas, periods
    - Merge split words ("busy work" → "busywork", "50 plus" → "50+")
    - Fix URLs — correct any mangled domain names or paths
