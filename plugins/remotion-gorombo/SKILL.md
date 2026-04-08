@@ -128,7 +128,12 @@ npx tsx src/generate-broll.ts --output "public/<name>/broll/" --prompts prompts.
 
 The prompts.json format: `[{"name": "scene-02", "prompt": "description..."}, ...]`
 
-The script submits jobs to Krea.ai, polls until complete, downloads the clips, and extends them to 15s with ffmpeg. Load [./rules/b-roll.md](./rules/b-roll.md) for Ken Burns zoom effects and layering patterns for compositing b-roll behind scene content.
+The script submits jobs to Krea.ai, polls until complete, downloads the clips, and extends them to 15s with ffmpeg.
+
+When coding scenes with b-roll, you MUST follow the compositing pattern in [./rules/b-roll.md](./rules/b-roll.md):
+- B-roll layer: `AbsoluteFill` with `filter: "brightness(0.35)"` and `overflow: "hidden"`, OffthreadVideo with Ken Burns bounce zoom
+- Content layer: `AbsoluteFill` with safe zone padding and `justifyContent: "center"`
+- All text/elements over b-roll MUST have dark semi-transparent card backgrounds (`backgroundColor: "rgba(10,10,10,0.7)"`) for readability
 
 ### Step 5: Transitions
 The scaffold sets up a basic TransitionSeries. When adding multiple scenes (Step 2), add `<TransitionSeries.Transition>` elements with `fade()` between each sequence at 1-1.5 seconds (30-45 frames at 30fps). Define `PADDING_FRAMES` (silence after voiceover ends) and ensure it is >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer. Load [./rules/transitions.md](./rules/transitions.md) for the full transition pattern with code examples.
