@@ -116,9 +116,19 @@ npx tsx src/<Name>/generate-voiceover.ts
 After voiceover files are generated, **update `index.tsx`**: replace the placeholder `calculateMetadata` with one that reads actual audio durations using `getAudioDuration`. The composition duration should be driven by the voiceover audio, not hardcoded frame counts. Load [./rules/voiceover.md](./rules/voiceover.md) for the exact calculateMetadata pattern.
 
 ### Step 4: B-roll
-Decide which scenes get b-roll backgrounds. Allocate ~2 b-roll clips per 30 seconds of video. Any scene can have b-roll — it's a background layer independent of the foreground content (text, charts, animated diagrams, anything). Load [./rules/b-roll.md](./rules/b-roll.md) for generation, zoom effects, and layering details.
+Decide which scenes get b-roll backgrounds. Allocate ~2 b-roll clips per 30 seconds of video. Any scene can have b-roll — it's a background layer independent of the foreground content (text, charts, animated diagrams, anything).
 
 **Update project.json:** For each scene, fill in `broll.type` ("image", "video", or "none") and `broll.prompt`.
+
+Then generate the b-roll clips. Create a prompts JSON file from the project.json b-roll entries and run:
+
+```bash
+npx tsx src/generate-broll.ts --output "public/<name>/broll/" --prompts prompts.json
+```
+
+The prompts.json format: `[{"name": "scene-02", "prompt": "description..."}, ...]`
+
+The script submits jobs to Krea.ai, polls until complete, downloads the clips, and extends them to 15s with ffmpeg. Load [./rules/b-roll.md](./rules/b-roll.md) for Ken Burns zoom effects and layering patterns for compositing b-roll behind scene content.
 
 ### Step 5: Transitions
 The scaffold sets up a basic TransitionSeries. When adding multiple scenes (Step 2), add `<TransitionSeries.Transition>` elements with `fade()` between each sequence at 1-1.5 seconds (30-45 frames at 30fps). Define `PADDING_FRAMES` (silence after voiceover ends) and ensure it is >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer. Load [./rules/transitions.md](./rules/transitions.md) for the full transition pattern with code examples.
