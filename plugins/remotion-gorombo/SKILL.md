@@ -197,6 +197,7 @@ When needing to use sound effects, load the [./rules/sound-effects.md](./rules/s
 
 Read individual rule files for detailed explanations and code examples:
 
+- [rules/vertical-layout.md](rules/vertical-layout.md) - **CSS layout patterns for 9:16 video** — centered lists, grids, safe zones, section spacing. READ THIS BEFORE WRITING ANY SCENE.
 - [rules/3d.md](rules/3d.md) - 3D content in Remotion using Three.js and React Three Fiber
 - [rules/animations.md](rules/animations.md) - Fundamental animation skills for Remotion
 - [rules/assets.md](rules/assets.md) - Importing images, videos, audio, and fonts into Remotion
