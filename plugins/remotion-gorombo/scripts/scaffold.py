@@ -5,7 +5,7 @@ Usage: python3 scaffold.py <CompositionName>
 
 Creates the full directory structure, template files, project.json,
 and registers the composition in Root.tsx. The composition starts
-with one placeholder scene — duplicate it for additional scenes.
+with two placeholder scenes and a fade transition between them.
 """
 
 import argparse
@@ -42,42 +42,12 @@ def write_file(path, content):
     print(f"  created {os.path.relpath(path)}")
 
 
-def scaffold(name):
-    root = find_project_root()
-    kebab = to_kebab(name)
-    src_dir = os.path.join(root, "src", name)
-    pub_dir = os.path.join(root, "public", kebab)
+# ---------------------------------------------------------------------------
+# TSX Templates — use __PLACEHOLDER__ tokens, never Python f-strings,
+# to avoid conflicts with JSX curly braces.
+# ---------------------------------------------------------------------------
 
-    if os.path.exists(src_dir):
-        print(f"Error: src/{name}/ already exists.", file=sys.stderr)
-        sys.exit(1)
-
-    print(f"Scaffolding composition: {name}")
-    print(f"  src:    src/{name}/")
-    print(f"  public: public/{kebab}/")
-    print()
-
-    # --- Public directories ---
-    for sub in ["voiceover", "broll", "captions"]:
-        os.makedirs(os.path.join(pub_dir, sub), exist_ok=True)
-        print(f"  created public/{kebab}/{sub}/")
-
-    # --- get-audio-duration.ts ---
-    write_file(os.path.join(src_dir, "get-audio-duration.ts"), """import { parseMedia } from "@remotion/media-parser";
-import { webReader } from "@remotion/media-parser/web";
-
-export const getAudioDuration = async (src: string) => {
-  const result = await parseMedia({
-    src,
-    fields: { durationInSeconds: true },
-    reader: webReader,
-  });
-  return result.durationInSeconds!;
-};
-""")
-
-    # --- Scene1.tsx ---
-    write_file(os.path.join(src_dir, "Scene1.tsx"), """import {
+SCENE_TEMPLATE = r"""import {
   AbsoluteFill,
   useCurrentFrame,
   useVideoConfig,
@@ -85,7 +55,7 @@ export const getAudioDuration = async (src: string) => {
   interpolate,
 } from "remotion";
 
-export const Scene1: React.FC = () => {
+export const __COMP__: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -152,7 +122,7 @@ export const Scene1: React.FC = () => {
           }}
         >
           <span style={{ fontSize: 56, fontFamily: "Inter", fontWeight: 800, color: "#6366f1" }}>
-            1
+            __NUM__
           </span>
         </div>
 
@@ -167,7 +137,7 @@ export const Scene1: React.FC = () => {
             textAlign: "center",
           }}
         >
-          Scene 1
+          Scene __NUM__
         </h1>
       </div>
 
@@ -214,10 +184,9 @@ export const Scene1: React.FC = () => {
     </AbsoluteFill>
   );
 };
-""")
+"""
 
-    # --- Captions.tsx ---
-    write_file(os.path.join(src_dir, "Captions.tsx"), '''import { useState, useEffect, useCallback, useMemo } from "react";
+CAPTIONS_TEMPLATE = r"""import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   AbsoluteFill,
   Sequence,
@@ -348,12 +317,26 @@ export const Captions: React.FC<{ captionFile: string }> = ({
     </AbsoluteFill>
   );
 };
-''')
+"""
 
-    # --- generate-voiceover.ts ---
-    write_file(os.path.join(src_dir, "generate-voiceover.ts"), f'''import {{ writeFileSync, mkdirSync, existsSync, readFileSync }} from "fs";
+GET_AUDIO_DURATION_TEMPLATE = r"""import { parseMedia } from "@remotion/media-parser";
+import { webReader } from "@remotion/media-parser/web";
+
+export const getAudioDuration = async (src: string) => {
+  const result = await parseMedia({
+    src,
+    fields: { durationInSeconds: true },
+    reader: webReader,
+  });
+  return result.durationInSeconds!;
+};
+"""
+
+# Templates that need __KEBAB__ substitution use plain strings with replace()
+
+GENERATE_VOICEOVER_TEMPLATE = r"""import { writeFileSync, mkdirSync, existsSync, readFileSync } from "fs";
 import path from "path";
-import {{ loadEnv }} from "../load-env";
+import { loadEnv } from "../load-env";
 
 loadEnv();
 const API_KEY = process.env.ELEVENLABS_API_KEY!;
@@ -363,173 +346,171 @@ const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), 
 const project = JSON.parse(readFileSync(PROJECT_FILE, "utf-8"));
 const VOICE_ID = project.voice?.voice_id || process.env.ELEVENLABS_VOICE_ID || "";
 const SCENES = project.scenes
-  .filter((s: {{ voiceover: string }}) => s.voiceover)
-  .map((s: {{ id: string; voiceover: string }}) => ({{ id: s.id, text: s.voiceover }}));
+  .filter((s: { voiceover: string }) => s.voiceover)
+  .map((s: { id: string; voiceover: string }) => ({ id: s.id, text: s.voiceover }));
 
-const OUTPUT_DIR = path.join("public", "{kebab}", "voiceover");
+const OUTPUT_DIR = path.join("public", "__KEBAB__", "voiceover");
 
-async function generateScene(scene: {{ id: string; text: string }}) {{
-  console.log(`Generating ${{scene.id}}...`);
+async function generateScene(scene: { id: string; text: string }) {
+  console.log(`Generating ${scene.id}...`);
 
   const response = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${{VOICE_ID}}`,
-    {{
+    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+    {
       method: "POST",
-      headers: {{
+      headers: {
         "xi-api-key": API_KEY,
         "Content-Type": "application/json",
         Accept: "audio/mpeg",
-      }},
-      body: JSON.stringify({{
+      },
+      body: JSON.stringify({
         text: scene.text,
         model_id: "eleven_multilingual_v2",
-        voice_settings: {{
+        voice_settings: {
           stability: 0.5,
           similarity_boost: 0.75,
           style: 0.3,
-        }},
-      }}),
-    }}
+        },
+      }),
+    }
   );
 
-  if (!response.ok) {{
+  if (!response.ok) {
     const err = await response.text();
-    throw new Error(`ElevenLabs API error for ${{scene.id}}: ${{response.status}} ${{err}}`);
-  }}
+    throw new Error(`ElevenLabs API error for ${scene.id}: ${response.status} ${err}`);
+  }
 
   const audioBuffer = Buffer.from(await response.arrayBuffer());
-  const outPath = path.join(OUTPUT_DIR, `${{scene.id}}.mp3`);
+  const outPath = path.join(OUTPUT_DIR, `${scene.id}.mp3`);
   writeFileSync(outPath, audioBuffer);
-  console.log(`  → ${{outPath}} (${{(audioBuffer.length / 1024).toFixed(1)}} KB)`);
-}}
+  console.log(`  → ${outPath} (${(audioBuffer.length / 1024).toFixed(1)} KB)`);
+}
 
-async function main() {{
-  if (!API_KEY) {{
+async function main() {
+  if (!API_KEY) {
     console.error("ELEVENLABS_API_KEY not set");
     process.exit(1);
-  }}
+  }
 
-  if (!VOICE_ID) {{
+  if (!VOICE_ID) {
     console.error("No voice ID configured. Set voice.voice_id in project.json or ELEVENLABS_VOICE_ID in .env");
     process.exit(1);
-  }}
+  }
 
-  if (SCENES.length === 0) {{
+  if (SCENES.length === 0) {
     console.error("No scenes with voiceover text found in project.json");
     process.exit(1);
-  }}
+  }
 
-  if (!existsSync(OUTPUT_DIR)) {{
-    mkdirSync(OUTPUT_DIR, {{ recursive: true }});
-  }}
+  if (!existsSync(OUTPUT_DIR)) {
+    mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
 
-  for (const scene of SCENES) {{
+  for (const scene of SCENES) {
     await generateScene(scene);
-  }}
+  }
 
-  console.log("\\nAll voiceover files generated!");
-}}
+  console.log("\nAll voiceover files generated!");
+}
 
-main().catch((err) => {{
+main().catch((err) => {
   console.error(err);
   process.exit(1);
-}});
-''')
+});
+"""
 
-    # --- generate-captions.ts ---
-    write_file(os.path.join(src_dir, "generate-captions.ts"), f'''import path from "path";
+GENERATE_CAPTIONS_TEMPLATE = r"""import path from "path";
 import fs from "fs";
-import {{ execFileSync }} from "child_process";
-import {{
+import { execFileSync } from "child_process";
+import {
   downloadWhisperModel,
   installWhisperCpp,
   transcribe,
   toCaptions,
-}} from "@remotion/install-whisper-cpp";
+} from "@remotion/install-whisper-cpp";
 
 const PROJECT_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
 const WHISPER_DIR = path.join(PROJECT_DIR, "whisper.cpp");
-const VOICEOVER_DIR = path.join(PROJECT_DIR, "public", "{kebab}", "voiceover");
-const CAPTIONS_DIR = path.join(PROJECT_DIR, "public", "{kebab}", "captions");
+const VOICEOVER_DIR = path.join(PROJECT_DIR, "public", "__KEBAB__", "voiceover");
+const CAPTIONS_DIR = path.join(PROJECT_DIR, "public", "__KEBAB__", "captions");
 
 // Read scene IDs from project.json — single source of truth
 const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), "project.json");
 const project = JSON.parse(fs.readFileSync(PROJECT_FILE, "utf-8"));
-const SCENES: string[] = project.scenes.map((s: {{ id: string }}) => s.id);
+const SCENES: string[] = project.scenes.map((s: { id: string }) => s.id);
 
-async function main() {{
-  if (SCENES.length === 0) {{
+async function main() {
+  if (SCENES.length === 0) {
     console.error("No scenes found in project.json");
     process.exit(1);
-  }}
+  }
 
   // Install whisper.cpp if needed
-  if (!fs.existsSync(path.join(WHISPER_DIR, "main"))) {{
+  if (!fs.existsSync(path.join(WHISPER_DIR, "main"))) {
     console.log("Installing whisper.cpp...");
-    await installWhisperCpp({{ to: WHISPER_DIR, version: "1.5.5" }});
-  }}
+    await installWhisperCpp({ to: WHISPER_DIR, version: "1.5.5" });
+  }
 
   // Download model if needed
-  if (!fs.existsSync(path.join(WHISPER_DIR, "models", "ggml-medium.en.bin"))) {{
+  if (!fs.existsSync(path.join(WHISPER_DIR, "models", "ggml-medium.en.bin"))) {
     console.log("Downloading medium.en model...");
-    await downloadWhisperModel({{ model: "medium.en", folder: WHISPER_DIR }});
-  }}
+    await downloadWhisperModel({ model: "medium.en", folder: WHISPER_DIR });
+  }
 
   // Create captions output dir
-  if (!fs.existsSync(CAPTIONS_DIR)) {{
-    fs.mkdirSync(CAPTIONS_DIR, {{ recursive: true }});
-  }}
+  if (!fs.existsSync(CAPTIONS_DIR)) {
+    fs.mkdirSync(CAPTIONS_DIR, { recursive: true });
+  }
 
-  for (const scene of SCENES) {{
-    const mp3Path = path.join(VOICEOVER_DIR, `${{scene}}.mp3`);
-    const wavPath = path.join(VOICEOVER_DIR, `${{scene}}.wav`);
-    const captionPath = path.join(CAPTIONS_DIR, `${{scene}}.json`);
+  for (const scene of SCENES) {
+    const mp3Path = path.join(VOICEOVER_DIR, `${scene}.mp3`);
+    const wavPath = path.join(VOICEOVER_DIR, `${scene}.wav`);
+    const captionPath = path.join(CAPTIONS_DIR, `${scene}.json`);
 
-    if (!fs.existsSync(mp3Path)) {{
-      console.log(`Skipping ${{scene}} — no mp3 found`);
+    if (!fs.existsSync(mp3Path)) {
+      console.log(`Skipping ${scene} — no mp3 found`);
       continue;
-    }}
+    }
 
     // Convert to 16KHz wav for whisper
-    console.log(`Converting ${{scene}} to wav...`);
-    execFileSync("ffmpeg", ["-i", mp3Path, "-ar", "16000", wavPath, "-y"], {{
+    console.log(`Converting ${scene} to wav...`);
+    execFileSync("ffmpeg", ["-i", mp3Path, "-ar", "16000", wavPath, "-y"], {
       stdio: "ignore",
-    }});
+    });
 
     // Transcribe
-    console.log(`Transcribing ${{scene}}...`);
-    const whisperOutput = await transcribe({{
+    console.log(`Transcribing ${scene}...`);
+    const whisperOutput = await transcribe({
       model: "medium.en",
       whisperPath: WHISPER_DIR,
       whisperCppVersion: "1.5.5",
       inputPath: wavPath,
       tokenLevelTimestamps: true,
-    }});
+    });
 
-    const {{ captions }} = toCaptions({{ whisperCppOutput: whisperOutput }});
+    const { captions } = toCaptions({ whisperCppOutput: whisperOutput });
 
     fs.writeFileSync(captionPath, JSON.stringify(captions, null, 2));
-    console.log(`  → ${{captionPath}} (${{captions.length}} captions)`);
+    console.log(`  → ${captionPath} (${captions.length} captions)`);
 
     // Clean up wav
     fs.unlinkSync(wavPath);
-  }}
+  }
 
-  console.log("\\nAll captions generated!");
-}}
+  console.log("\nAll captions generated!");
+}
 
-main().catch((err) => {{
+main().catch((err) => {
   console.error(err);
   process.exit(1);
-}});
-''')
+});
+"""
 
-    # --- generate-background-music.ts ---
-    write_file(os.path.join(src_dir, "generate-background-music.ts"), f'''import {{ writeFileSync, mkdirSync, existsSync, readFileSync, readdirSync }} from "fs";
+GENERATE_BACKGROUND_MUSIC_TEMPLATE = r"""import { writeFileSync, mkdirSync, existsSync, readFileSync, readdirSync } from "fs";
 import path from "path";
-import {{ loadEnv }} from "../load-env";
-import {{ parseMedia }} from "@remotion/media-parser";
-import {{ nodeReader }} from "@remotion/media-parser/node";
+import { loadEnv } from "../load-env";
+import { parseMedia } from "@remotion/media-parser";
+import { nodeReader } from "@remotion/media-parser/node";
 
 loadEnv();
 const API_KEY = process.env.ELEVENLABS_API_KEY!;
@@ -539,151 +520,211 @@ const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), 
 const project = JSON.parse(readFileSync(PROJECT_FILE, "utf-8"));
 
 const PROJECT_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
-const VOICEOVER_DIR = path.join(PROJECT_DIR, "public", "{kebab}", "voiceover");
-const OUTPUT_PATH = path.join(PROJECT_DIR, "public", "{kebab}", "background-music.mp3");
+const VOICEOVER_DIR = path.join(PROJECT_DIR, "public", "__KEBAB__", "voiceover");
+const OUTPUT_PATH = path.join(PROJECT_DIR, "public", "__KEBAB__", "background-music.mp3");
 
-const MOOD_PROMPTS: Record<string, string> = {{
+const MOOD_PROMPTS: Record<string, string> = {
   upbeat: "upbeat corporate background music, energetic but not overpowering, modern and clean",
   corporate: "soft corporate background music, professional and clean, subtle piano and light percussion",
   cinematic: "cinematic background music, dramatic and emotional, orchestral strings and atmosphere",
   ambient: "soft ambient background music, gentle and atmospheric, minimal and calming",
-}};
+};
 
-async function getFileDuration(filePath: string): Promise<number> {{
-  const result = await parseMedia({{
+async function getFileDuration(filePath: string): Promise<number> {
+  const result = await parseMedia({
     src: filePath,
-    fields: {{ durationInSeconds: true }},
+    fields: { durationInSeconds: true },
     reader: nodeReader,
-  }});
+  });
   return result.durationInSeconds!;
-}}
+}
 
-async function getTotalDuration(): Promise<number> {{
+async function getTotalDuration(): Promise<number> {
   const files = readdirSync(VOICEOVER_DIR).filter((f) => f.endsWith(".mp3"));
-  if (files.length === 0) {{
+  if (files.length === 0) {
     throw new Error("No voiceover files found. Generate voiceover first.");
-  }}
+  }
   let total = 0;
-  for (const file of files) {{
+  for (const file of files) {
     const duration = await getFileDuration(path.join(VOICEOVER_DIR, file));
     total += duration;
-  }}
+  }
   return total;
-}}
+}
 
-async function main() {{
-  if (!API_KEY) {{
+async function main() {
+  if (!API_KEY) {
     console.error("ELEVENLABS_API_KEY not set");
     process.exit(1);
-  }}
+  }
 
-  if (!project.background_music?.enabled) {{
+  if (!project.background_music?.enabled) {
     console.log("Background music disabled in project.json — skipping.");
     process.exit(0);
-  }}
+  }
 
   const mood = project.background_music.mood || "ambient";
   const prompt = MOOD_PROMPTS[mood] || mood;
 
-  console.log(`Generating background music (mood: ${{mood}})...`);
+  console.log(`Generating background music (mood: ${mood})...`);
 
   const totalDuration = await getTotalDuration();
   const durationMs = Math.ceil(totalDuration * 1000);
 
-  console.log(`  Total voiceover duration: ${{totalDuration.toFixed(1)}}s → music: ${{durationMs}}ms`);
+  console.log(`  Total voiceover duration: ${totalDuration.toFixed(1)}s → music: ${durationMs}ms`);
 
-  const response = await fetch("https://api.elevenlabs.io/v1/music?output_format=mp3_44100_128", {{
+  const response = await fetch("https://api.elevenlabs.io/v1/music?output_format=mp3_44100_128", {
     method: "POST",
-    headers: {{
+    headers: {
       "xi-api-key": API_KEY,
       "Content-Type": "application/json",
-    }},
-    body: JSON.stringify({{
+    },
+    body: JSON.stringify({
       prompt,
       music_length_ms: durationMs,
       force_instrumental: true,
-    }}),
-  }});
+    }),
+  });
 
-  if (!response.ok) {{
+  if (!response.ok) {
     const err = await response.text();
-    throw new Error(`ElevenLabs Music API error: ${{response.status}} ${{err}}`);
-  }}
+    throw new Error(`ElevenLabs Music API error: ${response.status} ${err}`);
+  }
 
   const audioBuffer = Buffer.from(await response.arrayBuffer());
 
   const outputDir = path.dirname(OUTPUT_PATH);
-  if (!existsSync(outputDir)) {{
-    mkdirSync(outputDir, {{ recursive: true }});
-  }}
+  if (!existsSync(outputDir)) {
+    mkdirSync(outputDir, { recursive: true });
+  }
 
   writeFileSync(OUTPUT_PATH, audioBuffer);
-  console.log(`  → ${{OUTPUT_PATH}} (${{(audioBuffer.length / 1024).toFixed(1)}} KB)`);
-  console.log("\\nBackground music generated!");
-}}
+  console.log(`  → ${OUTPUT_PATH} (${(audioBuffer.length / 1024).toFixed(1)} KB)`);
+  console.log("\nBackground music generated!");
+}
 
-main().catch((err) => {{
+main().catch((err) => {
   console.error(err);
   process.exit(1);
-}});
-''')
+});
+"""
 
-    # --- index.tsx ---
-    write_file(os.path.join(src_dir, "index.tsx"), f'''import {{ TransitionSeries, linearTiming }} from "@remotion/transitions";
-import {{ fade }} from "@remotion/transitions/fade";
-import {{ Audio }} from "@remotion/media";
-import {{ loadFont }} from "@remotion/google-fonts/Inter";
-import {{ AbsoluteFill, CalculateMetadataFunction, staticFile }} from "remotion";
-import {{ Scene1 }} from "./Scene1";
+INDEX_TEMPLATE = r"""import { TransitionSeries, linearTiming } from "@remotion/transitions";
+import { fade } from "@remotion/transitions/fade";
+import { Audio } from "@remotion/media";
+import { loadFont } from "@remotion/google-fonts/Inter";
+import { AbsoluteFill, CalculateMetadataFunction, staticFile } from "remotion";
+import { Scene1 } from "./Scene1";
+import { Scene2 } from "./Scene2";
 
-loadFont("normal", {{ weights: ["400", "600", "800"], subsets: ["latin"] }});
+loadFont("normal", { weights: ["400", "600", "800"], subsets: ["latin"] });
 
 const FPS = 30;
 const TRANSITION_DURATION = 36; // 1.2 seconds
+const PADDING_FRAMES = 45; // silence after voiceover — MUST be >= TRANSITION_DURATION
 const DEFAULT_SCENE_DURATION = 150; // 5 seconds placeholder
-const BACKGROUND_MUSIC_FILE = "{kebab}/background-music.mp3";
+const BACKGROUND_MUSIC_FILE = "__KEBAB__/background-music.mp3";
 const BACKGROUND_MUSIC_VOLUME = 0.15;
 
-export type {name}Props = {{
+export type __NAME__Props = {
   scene1Duration: number;
+  scene2Duration: number;
   hasBackgroundMusic: boolean;
-}};
+};
 
-export const calculate{name}Metadata: CalculateMetadataFunction<
-  {name}Props
-> = async ({{ props }}) => {{
-  // When voiceover exists, this will read audio durations.
-  // For now, use placeholder durations.
-  return {{
-    durationInFrames: props.scene1Duration,
+export const calculate__NAME__Metadata: CalculateMetadataFunction<
+  __NAME__Props
+> = async ({ props }) => {
+  // When voiceover exists, replace placeholder durations with actual audio durations.
+  // See rules/voiceover.md for the getAudioDuration + calculateMetadata pattern.
+  const totalFrames = props.scene1Duration + props.scene2Duration - TRANSITION_DURATION;
+  return {
+    durationInFrames: totalFrames,
     props,
-  }};
-}};
+  };
+};
 
-export const {name}: React.FC<{name}Props> = ({{
+export const __NAME__: React.FC<__NAME__Props> = ({
   scene1Duration,
+  scene2Duration,
   hasBackgroundMusic,
-}}) => {{
+}) => {
   return (
     <AbsoluteFill>
       <TransitionSeries>
-        <TransitionSeries.Sequence durationInFrames={{scene1Duration}}>
+        <TransitionSeries.Sequence durationInFrames={scene1Duration}>
           <Scene1 />
         </TransitionSeries.Sequence>
 
-        {{/* Additional scenes and transitions will be added here */}}
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: TRANSITION_DURATION })}
+        />
+
+        <TransitionSeries.Sequence durationInFrames={scene2Duration}>
+          <Scene2 />
+        </TransitionSeries.Sequence>
+
+        {/* Additional scenes and transitions follow this same pattern */}
       </TransitionSeries>
 
-      {{hasBackgroundMusic && (
+      {hasBackgroundMusic && (
         <Audio
-          src={{staticFile(BACKGROUND_MUSIC_FILE)}}
-          volume={{BACKGROUND_MUSIC_VOLUME}}
+          src={staticFile(BACKGROUND_MUSIC_FILE)}
+          volume={BACKGROUND_MUSIC_VOLUME}
         />
-      )}}
+      )}
     </AbsoluteFill>
   );
-}};
-''')
+};
+"""
+
+
+# ---------------------------------------------------------------------------
+# Scaffold function
+# ---------------------------------------------------------------------------
+
+def scaffold(name):
+    root = find_project_root()
+    kebab = to_kebab(name)
+    src_dir = os.path.join(root, "src", name)
+    pub_dir = os.path.join(root, "public", kebab)
+
+    if os.path.exists(src_dir):
+        print(f"Error: src/{name}/ already exists.", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Scaffolding composition: {name}")
+    print(f"  src:    src/{name}/")
+    print(f"  public: public/{kebab}/")
+    print()
+
+    # --- Public directories ---
+    for sub in ["voiceover", "broll", "captions"]:
+        os.makedirs(os.path.join(pub_dir, sub), exist_ok=True)
+        print(f"  created public/{kebab}/{sub}/")
+
+    # --- Static files (no substitution needed) ---
+    write_file(os.path.join(src_dir, "get-audio-duration.ts"), GET_AUDIO_DURATION_TEMPLATE)
+    write_file(os.path.join(src_dir, "Captions.tsx"), CAPTIONS_TEMPLATE)
+
+    # --- Scene files ---
+    write_file(os.path.join(src_dir, "Scene1.tsx"),
+               SCENE_TEMPLATE.replace("__COMP__", "Scene1").replace("__NUM__", "1"))
+    write_file(os.path.join(src_dir, "Scene2.tsx"),
+               SCENE_TEMPLATE.replace("__COMP__", "Scene2").replace("__NUM__", "2"))
+
+    # --- Files needing __KEBAB__ substitution ---
+    write_file(os.path.join(src_dir, "generate-voiceover.ts"),
+               GENERATE_VOICEOVER_TEMPLATE.replace("__KEBAB__", kebab))
+    write_file(os.path.join(src_dir, "generate-captions.ts"),
+               GENERATE_CAPTIONS_TEMPLATE.replace("__KEBAB__", kebab))
+    write_file(os.path.join(src_dir, "generate-background-music.ts"),
+               GENERATE_BACKGROUND_MUSIC_TEMPLATE.replace("__KEBAB__", kebab))
+
+    # --- Files needing __NAME__ and __KEBAB__ substitution ---
+    write_file(os.path.join(src_dir, "index.tsx"),
+               INDEX_TEMPLATE.replace("__NAME__", name).replace("__KEBAB__", kebab))
 
     # --- project.json ---
     project = {
@@ -718,10 +759,15 @@ export const {name}: React.FC<{name}Props> = ({{
                 "headline": "",
                 "voiceover": "",
                 "visual": "",
-                "broll": {
-                    "type": "",
-                    "prompt": ""
-                },
+                "broll": {"type": "", "prompt": ""},
+                "status": "pending"
+            },
+            {
+                "id": "scene-02",
+                "headline": "",
+                "voiceover": "",
+                "visual": "",
+                "broll": {"type": "", "prompt": ""},
                 "status": "pending"
             }
         ]
@@ -731,53 +777,52 @@ export const {name}: React.FC<{name}Props> = ({{
     # --- Register in Root.tsx ---
     root_path = os.path.join(root, "src", "Root.tsx")
     if not os.path.exists(root_path):
-        print(f"Warning: src/Root.tsx not found — skipping registration", file=sys.stderr)
+        print("Warning: src/Root.tsx not found — skipping registration", file=sys.stderr)
     else:
-        with open(root_path, "r") as f:
+        with open(root_path, "r", encoding="utf-8") as f:
             root_content = f.read()
 
-        # Add import after the last import block
-        import_line = f'''import {{
-  {name},
-  calculate{name}Metadata,
-  {name}Props,
-}} from "./{name}";'''
+        import_line = (
+            f'import {{\n'
+            f'  {name},\n'
+            f'  calculate{name}Metadata,\n'
+            f'  {name}Props,\n'
+            f'}} from "./{name}";'
+        )
 
-        # Find the last import statement and insert after it
-        last_import = root_content.rfind("} from \"./")
+        last_import = root_content.rfind('} from "./')
         if last_import == -1:
             print("Warning: Could not find import block in Root.tsx — skipping registration", file=sys.stderr)
         else:
             end_of_import = root_content.index("\n", root_content.index(";", last_import)) + 1
             root_content = root_content[:end_of_import] + import_line + "\n" + root_content[end_of_import:]
 
-            # Add Composition entry before the closing </>
-            comp_entry = f'''      <Composition
-        id="{name}"
-        component={{{name}}}
-        durationInFrames={{150}}
-        fps={{30}}
-        width={{1080}}
-        height={{1920}}
-        defaultProps={{
-          {{
-            scene1Duration: 150,
-            hasBackgroundMusic: false,
-          }} satisfies {name}Props
-        }}
-        calculateMetadata={{calculate{name}Metadata}}
-      />'''
+            comp_entry = (
+                f'      <Composition\n'
+                f'        id="{name}"\n'
+                f'        component={{{name}}}\n'
+                f'        durationInFrames={{264}}\n'
+                f'        fps={{30}}\n'
+                f'        width={{1080}}\n'
+                f'        height={{1920}}\n'
+                f'        defaultProps={{{{\n'
+                f'          scene1Duration: 150,\n'
+                f'          scene2Duration: 150,\n'
+                f'          hasBackgroundMusic: false,\n'
+                f'        }} satisfies {name}Props}}\n'
+                f'        calculateMetadata={{calculate{name}Metadata}}\n'
+                f'      />'
+            )
 
             if "    </>" not in root_content:
                 print("Warning: Could not find </> closing tag in Root.tsx — skipping registration", file=sys.stderr)
             else:
                 root_content = root_content.replace("    </>", comp_entry + "\n    </>")
-
                 with open(root_path, "w", encoding="utf-8", newline="\n") as f:
                     f.write(root_content)
                 print(f"  registered in src/Root.tsx")
 
-    print(f"\nScaffold complete! Open Remotion Studio to preview.")
+    print(f"\nScaffold complete! Start Remotion Studio to preview.")
 
 
 def main():
