@@ -357,11 +357,11 @@ import {{ loadEnv }} from "../load-env";
 
 loadEnv();
 const API_KEY = process.env.ELEVENLABS_API_KEY!;
-const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "nPczCjzI2devNBz1zQrb"; // Set ELEVENLABS_VOICE_ID in .env
 
-// Read scenes from project.json — single source of truth
+// Read config from project.json — single source of truth
 const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), "project.json");
 const project = JSON.parse(readFileSync(PROJECT_FILE, "utf-8"));
+const VOICE_ID = project.voice?.voice_id || process.env.ELEVENLABS_VOICE_ID || "";
 const SCENES = project.scenes
   .filter((s: {{ voiceover: string }}) => s.voiceover)
   .map((s: {{ id: string; voiceover: string }}) => ({{ id: s.id, text: s.voiceover }}));
@@ -406,6 +406,11 @@ async function generateScene(scene: {{ id: string; text: string }}) {{
 async function main() {{
   if (!API_KEY) {{
     console.error("ELEVENLABS_API_KEY not set");
+    process.exit(1);
+  }}
+
+  if (!VOICE_ID) {{
+    console.error("No voice ID configured. Set voice.voice_id in project.json or ELEVENLABS_VOICE_ID in .env");
     process.exit(1);
   }}
 
@@ -523,8 +528,8 @@ main().catch((err) => {{
     write_file(os.path.join(src_dir, "generate-background-music.ts"), f'''import {{ writeFileSync, mkdirSync, existsSync, readFileSync, readdirSync }} from "fs";
 import path from "path";
 import {{ loadEnv }} from "../load-env";
-import {{ getAudioDuration }} from "./get-audio-duration";
-import {{ staticFile }} from "remotion";
+import {{ parseMedia }} from "@remotion/media-parser";
+import {{ nodeReader }} from "@remotion/media-parser/node";
 
 loadEnv();
 const API_KEY = process.env.ELEVENLABS_API_KEY!;
@@ -533,8 +538,9 @@ const API_KEY = process.env.ELEVENLABS_API_KEY!;
 const PROJECT_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), "project.json");
 const project = JSON.parse(readFileSync(PROJECT_FILE, "utf-8"));
 
-const VOICEOVER_DIR = path.join("public", "{kebab}", "voiceover");
-const OUTPUT_PATH = path.join("public", "{kebab}", "background-music.mp3");
+const PROJECT_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
+const VOICEOVER_DIR = path.join(PROJECT_DIR, "public", "{kebab}", "voiceover");
+const OUTPUT_PATH = path.join(PROJECT_DIR, "public", "{kebab}", "background-music.mp3");
 
 const MOOD_PROMPTS: Record<string, string> = {{
   upbeat: "upbeat corporate background music, energetic but not overpowering, modern and clean",
@@ -543,6 +549,15 @@ const MOOD_PROMPTS: Record<string, string> = {{
   ambient: "soft ambient background music, gentle and atmospheric, minimal and calming",
 }};
 
+async function getFileDuration(filePath: string): Promise<number> {{
+  const result = await parseMedia({{
+    src: filePath,
+    fields: {{ durationInSeconds: true }},
+    reader: nodeReader,
+  }});
+  return result.durationInSeconds!;
+}}
+
 async function getTotalDuration(): Promise<number> {{
   const files = readdirSync(VOICEOVER_DIR).filter((f) => f.endsWith(".mp3"));
   if (files.length === 0) {{
@@ -550,7 +565,7 @@ async function getTotalDuration(): Promise<number> {{
   }}
   let total = 0;
   for (const file of files) {{
-    const duration = await getAudioDuration(staticFile(`{kebab}/voiceover/${{file}}`));
+    const duration = await getFileDuration(path.join(VOICEOVER_DIR, file));
     total += duration;
   }}
   return total;
@@ -678,10 +693,24 @@ export const {name}: React.FC<{name}Props> = ({{
         "height": 1920,
         "fps": 30,
         "render": "pending",
-        "youtube_publish": "pending",
+        "branding": {
+            "company": "",
+            "website": "",
+            "socials": []
+        },
+        "voice": {
+            "voice_id": ""
+        },
         "background_music": {
             "enabled": False,
             "mood": ""
+        },
+        "youtube": {
+            "publish": "pending",
+            "links": [],
+            "tags": [],
+            "category": "",
+            "description_notes": ""
         },
         "scenes": [
             {

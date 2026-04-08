@@ -66,13 +66,27 @@ When presenting the script for approval, ALWAYS show for every scene:
 - Visual description
 
 After the script, ask the user:
+- What's your company/brand name and website? (for captions proofreading and on-screen text)
+- What voice should we use? (provide the ElevenLabs voice ID, or leave blank to use ELEVENLABS_VOICE_ID from .env)
 - Background music? (yes/no, mood: upbeat/corporate/cinematic/ambient)
 - Auto-render when complete? (defaults to no)
-- Auto-publish to YouTube? (defaults to no)
+- Publishing to YouTube? → if yes:
+  - What links should go in the description? (website, socials, relevant pages)
+  - Tags and category?
+  - Auto-publish or manual approval? (defaults to manual)
 
-Use these exact values in project.json: `"render"` and `"youtube_publish"` must be `"pending"` (wait for approval) or `"approved"` (auto-proceed). After render completes, set `"render"` to `"completed"`. Do not use booleans or yes/no.
+Use these exact values for approval gates: `"pending"` (wait for approval), `"approved"` (auto-proceed), `"completed"` (done). Do not use booleans or yes/no.
 
-**Update project.json:** Fill in each scene's `headline`, `voiceover`, and `visual` fields. Update `background_music`, `render`, and `youtube_publish` with the user's answers. If the scene count changed, duplicate scene entries in the `scenes` array to match. Also duplicate the placeholder Scene1.tsx for each additional scene and update index.tsx to import and wire them all into the TransitionSeries.
+**Update project.json:** Fill in:
+- `branding.company`, `branding.website`, `branding.socials` — from the user's answers
+- `voice.voice_id` — the user's chosen voice ID (empty = use env var)
+- `background_music.enabled` and `background_music.mood` — from the user's answer
+- `render` — "pending" or "approved"
+- `youtube.publish` — "pending" or "approved" (only if publishing to YouTube)
+- `youtube.links`, `youtube.tags`, `youtube.category` — only if publishing to YouTube
+- Each scene's `headline`, `voiceover`, and `visual` fields
+
+If the scene count changed, duplicate scene entries in the `scenes` array to match. Also duplicate the placeholder Scene1.tsx for each additional scene and update index.tsx to import and wire them all into the TransitionSeries.
 
 ### Step 3: Voiceover generation
 The voiceover script reads directly from `project.json` — no need to edit the script itself. Just make sure the voiceover text is filled in for each scene in project.json (Step 2), then run:
@@ -96,11 +110,11 @@ All videos should have animated subtitles with word highlighting. Follow this se
 
 1. **Transcribe** — Use whisper.cpp to transcribe each scene's voiceover audio to get word-level timestamps. Output to `public/<name>/captions/`.
 2. **Proofread (MANDATORY)** — Whisper always mangles brand names, proper nouns, and punctuation. Before using transcripts:
-   - Fix brand names (e.g. "Garrombo" → "Gorombo", "SIM 1" → "SIM-ONE")
+   - Fix brand names — check `branding.company` in project.json and correct any misspellings Whisper introduced
    - Fix punctuation — add missing commas, periods
    - Merge split words ("busy work" → "busywork", "50 plus" → "50+")
-   - Fix URLs ("managedai" → "managed-ai")
-   - Compare transcript against the original voiceover script you wrote
+   - Fix URLs — correct any mangled domain names or paths
+   - Compare transcript against the original voiceover script in project.json
 3. **Display** — Use TikTok-style word highlighting. `SWITCH_CAPTIONS_EVERY_MS = 1800` gives breathing room after sentences. Lower values (1200ms) feel rushed with no pause after periods. The spacing after punctuation makes a huge difference in how captions read.
 4. **Last caption persists** — The final caption in each scene stays on screen until the scene ends.
 5. **Placement** — Add `<Captions>` at composition level inside each `TransitionSeries.Sequence`, not inside individual scene components.
@@ -130,9 +144,18 @@ If `render` is "approved" in project.json, render automatically when all scenes 
 npx remotion render <CompositionId> out/<name>.mp4 --port 3100
 ```
 
-After render completes, upload to Google Drive automatically (default delivery). If `youtube_publish` is "approved" in project.json, generate a YouTube description from the voiceover text and upload via `python3 youtube-upload.py`. Include any links the user has configured in their project or .env.
+After render completes, upload to Google Drive automatically (default delivery).
 
-**Update project.json:** Set `render` to "completed" after successful render.
+If `youtube.publish` is "approved" in project.json, generate a YouTube description by:
+- Summarizing the voiceover text from project.json scenes
+- Including all links from `youtube.links`
+- Using `youtube.tags` and `youtube.category`
+- Adding `branding.website` and any URLs from `branding.socials`
+- Incorporating any notes from `youtube.description_notes`
+
+Then upload via `python3 youtube-upload.py`.
+
+**Update project.json:** Set `render` to "completed" after successful render. Set `youtube.publish` to "completed" after successful upload.
 
 ## Using FFmpeg
 
