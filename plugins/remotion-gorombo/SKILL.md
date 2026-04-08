@@ -7,7 +7,18 @@ metadata:
 
 ## When to use
 
-Use this skills whenever you are dealing with Remotion code to obtain the domain-specific knowledge.
+Use this skill for the complete video production pipeline — from script writing through rendering and delivery. It includes scaffolding automation, voiceover/caption/music generation scripts, and detailed rule files for every Remotion pattern you'll need.
+
+## Prerequisites
+
+You need a Remotion project. If you don't have one, create it with `npx create-video@latest` and select the **blank template**. The project must have a `remotion.config.ts` at its root — the scaffold script uses this to locate the project.
+
+Required `.env` variables in the project root:
+- `ELEVENLABS_API_KEY` — for voiceover and background music generation
+- `ELEVENLABS_VOICE_ID` — default voice (optional if set per-project in project.json)
+- `KREA_API_KEY` — for b-roll generation (if using Krea)
+
+On first use, save the Remotion project location to memory so you can find it in future sessions.
 
 ## Scene planning
 
@@ -54,7 +65,7 @@ This automatically creates the full composition structure:
 - `public/<name>/voiceover/`, `public/<name>/broll/`, `public/<name>/captions/`
 - Registers the composition in `src/Root.tsx`
 
-After scaffolding, **restart Remotion Studio** so it picks up the new composition:
+After scaffolding, **start (or restart) Remotion Studio** so it picks up the new composition:
 
 ```bash
 npx remotion studio
@@ -93,7 +104,7 @@ Use these exact values for approval gates: `"pending"` (wait for approval), `"ap
 - `youtube.links`, `youtube.tags`, `youtube.category` — only if publishing to YouTube
 - Each scene's `headline`, `voiceover`, and `visual` fields
 
-If the scene count changed, duplicate scene entries in the `scenes` array to match. Also duplicate the placeholder Scene1.tsx for each additional scene and update index.tsx to import and wire them all into the TransitionSeries.
+If the scene count changed, duplicate scene entries in the `scenes` array to match. Also duplicate the placeholder Scene1.tsx for each additional scene (rename the component export to Scene2, Scene3, etc.) and update index.tsx to import all scenes and wire them into the TransitionSeries with fade transitions between each. Load [./rules/compositions.md](./rules/compositions.md) for composition patterns and [./rules/transitions.md](./rules/transitions.md) for the TransitionSeries wiring pattern.
 
 ### Step 3: Voiceover generation
 The voiceover script reads directly from `project.json` — no need to edit the script itself. Just make sure the voiceover text is filled in for each scene in project.json (Step 2), then run:
@@ -110,7 +121,7 @@ Decide which scenes get b-roll backgrounds. Allocate ~2 b-roll clips per 30 seco
 **Update project.json:** For each scene, fill in `broll.type` ("image", "video", or "none") and `broll.prompt`.
 
 ### Step 5: Transitions
-The scaffold already sets up TransitionSeries with fade transitions. Use `fade()` between scenes at 1-1.5 seconds (30-45 frames at 30fps). `PADDING_FRAMES` (silence after voiceover) MUST be >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer.
+The scaffold sets up a basic TransitionSeries. When adding multiple scenes (Step 2), add `<TransitionSeries.Transition>` elements with `fade()` between each sequence at 1-1.5 seconds (30-45 frames at 30fps). Define `PADDING_FRAMES` (silence after voiceover ends) and ensure it is >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer. Load [./rules/transitions.md](./rules/transitions.md) for the full transition pattern with code examples.
 
 ### Step 6: Captions
 All videos should have animated subtitles with word highlighting. Follow this sequence:
@@ -130,9 +141,9 @@ Output goes to `public/<name>/captions/`.
    - Compare transcript against the original voiceover script in project.json
 3. **Display** — Use TikTok-style word highlighting. `SWITCH_CAPTIONS_EVERY_MS = 1800` gives breathing room after sentences. Lower values (1200ms) feel rushed with no pause after periods. The spacing after punctuation makes a huge difference in how captions read.
 4. **Last caption persists** — The final caption in each scene stays on screen until the scene ends.
-5. **Placement** — Add `<Captions>` at composition level inside each `TransitionSeries.Sequence`, not inside individual scene components.
+5. **Placement** — Add `<Captions captionFile="<name>/captions/scene-01.json" />` at composition level inside each `TransitionSeries.Sequence`, not inside individual scene components. Each scene gets its own Captions component pointing to its caption JSON file.
 
-Load [./rules/subtitles.md](./rules/subtitles.md) for technical details on the Caption type, transcription, and display components.
+Load [./rules/subtitles.md](./rules/subtitles.md) for the full Caption component API, transcription details, and display patterns.
 
 ### Step 7: Background music
 If `background_music.enabled` is true in project.json, generate a background music track:
