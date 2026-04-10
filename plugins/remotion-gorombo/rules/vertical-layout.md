@@ -801,6 +801,62 @@ export const FullScene: React.FC = () => {
 
 ---
 
+## The 9-Quadrant Grid (for overlay-heavy scenes)
+
+When building scenes with multiple distinct overlay elements (as opposed to simple headline+subtitle layouts), use the 9-quadrant grid model:
+
+```
+1080x1920 frame
+================
+
++----------+  above the fold (atmospheric / decorative)
+|          |  ~0-300px — scan lines, tickers, accents
++----------+
+|  SAFE    |  row 1:  ~350-700px    (top content)
+|   ZONE   |  row 2:  ~750-1100px   (middle / hero content)
+|          |  row 3:  ~1150-1500px  (bottom content)
++----------+
+|          |  below the fold (atmospheric / decorative)
+|          |  ~1500-1920px — bokeh, particles, grids
++----------+
+```
+
+Every overlay-heavy scene must fill all 5 zones with something, not just the safe zone. An unused above-fold or below-fold area makes the frame feel empty and wastes the extra vertical real estate that the portrait format gives you.
+
+### Specific pixel anchors per row
+
+These are the working positions for elements in each row, not strict boundaries:
+
+| Zone | Y position | Typical content |
+|------|------------|-----------------|
+| Above fold | top: 120-280 | Scan bars, stock tickers, warning strips, scanning line sweeps, digital rain |
+| Safe row 1 | top: 350-700 | HUD elements, headline, stat counters, brackets + framed content |
+| Safe row 2 | top: 750-1100 | Hero text, center visual, logo, 3D objects — the ONE BIG thing |
+| Safe row 3 | top: 1150-1500 | Secondary info, slash dividers, progress bars, callouts |
+| Below fold | top: 1500-1900 | Bokeh dots, particles, network nodes, atmospheric elements |
+
+### Common mistake: content too high
+
+When something "feels too high" the fix is almost always to bias the whole scene DOWN by 75-150px. The default instinct is to place content near the top of the safe zone, but for vertical video the eye sits closer to the center-bottom on mobile.
+
+If the user says "move it down 50 pixels", do it literally. If they say "looks too high" without a number, try +100px first.
+
+### Above and below the fold are NOT decoration-only
+
+Above-fold and below-fold elements should relate to the scene's concept, not just be generic particles:
+
+- If the scene is about surveillance, above-fold can be a radar sweep and below-fold can be a targeting crosshair
+- If the scene is about finance, above-fold can be a stock ticker and below-fold can be dollar-sign rain
+- If the scene is about conditioning, above-fold can be scan lines and below-fold can be "They Live" style subliminal words
+
+These secondary-zone elements carry thematic weight. Use them intentionally.
+
+### Row spacing
+
+Minimum 80px between the bottom of one row and the top of the next. For "feels cramped" fixes, bump to 120-150px. See [sizing-and-weight.md](./sizing-and-weight.md) for the full spacing guidance.
+
+---
+
 ## Quick Reference: Positioning Cheat Sheet
 
 ```
@@ -819,13 +875,21 @@ Common absolute positions:
   Bottom subtitle:  bottom: 380, left: 60, right: 120
   Bottom CTA:       bottom: 340, left: 60, right: 120
 
+9-quadrant anchors (for overlay-heavy scenes):
+  Above fold:  top: 120-280
+  Safe row 1:  top: 350-700
+  Safe row 2:  top: 750-1100  (hero)
+  Safe row 3:  top: 1150-1500
+  Below fold:  top: 1500-1900
+
 Content area height: ~1130px (from top: 480 to bottom: 380)
 Safe zone total:     900px wide x 1400px tall
 
 Font sizes:
-  Hero headline:    72px, weight 800
-  Scene headline:   56-64px, weight 800
-  Body/feature:     36-40px, weight 600
-  Subtitle/caption: 32-36px, weight 400
+  Hero headline:    96-120px, weight 900  (center hero element)
+  Scene headline:   56-72px,  weight 800
+  Body/feature:     36-40px,  weight 600
+  Subtitle/caption: 32-36px,  weight 400
   Label/small:      28px minimum (anything smaller is unreadable on mobile)
+  Monospace/log:    14-18px,  weight 500-600
 ```
