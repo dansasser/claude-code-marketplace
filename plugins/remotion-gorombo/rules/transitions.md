@@ -195,3 +195,9 @@ const totalDuration =
   transition2Duration;
 // 60 + 60 + 60 - 15 - 20 = 145 frames
 ```
+
+## Talking-Head / UGC Content
+
+**Do NOT use `TransitionSeries` with audio inside the sequences for talking-head content.** When both sequences render during a transition, the speaker's audio doubles because the handle frames contain the same source audio.
+
+For talking-head dissolves, use the two-layer pattern documented in [talking-head-transitions.md](./talking-head-transitions.md): video dissolves on one layer (overlapping `<Sequence>` components with opacity interpolation), audio straight cuts on a separate layer (sequential `<Sequence>` components with no overlap).

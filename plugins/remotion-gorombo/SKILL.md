@@ -34,6 +34,20 @@ Before implementing any scenes, follow this sequence.
 
 All main content (headlines, key text, CTAs, stats, graphics) must be **centered vertically and horizontally**, building outward from dead center. This is the default unless explicitly overridden.
 
+**List/card layout pattern — MANDATORY for all numbered lists, step lists, feature lists:**
+The BLOCK is centered on screen. Items are LEFT-ALIGNED inside the centered block. Never center the text inside the items. The pattern:
+```tsx
+{/* Outer: centers the block */}
+<div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+  {/* Inner: left-aligns items within the centered block */}
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 24 }}>
+    {/* Each item sizes to content — block is only as wide as the longest item */}
+    <div style={{ display: "flex", alignItems: "center", gap: 20 }}>...</div>
+  </div>
+</div>
+```
+This makes the list float centered on screen with all items left-justified inside it. NEVER use `justifyContent: "center"` or `textAlign: "center"` on the items themselves.
+
 B-roll, backgrounds, decorative elements, and captions are NOT restricted to the safe zone — they fill the full frame.
 
 If the prompt doesn't specify landscape, default to portrait (9:16).
@@ -136,7 +150,13 @@ When coding scenes with b-roll, you MUST follow the compositing pattern in [./ru
 - All text/elements over b-roll MUST have dark semi-transparent card backgrounds (`backgroundColor: "rgba(10,10,10,0.7)"`) for readability
 
 ### Step 5: Transitions
-The scaffold sets up a basic TransitionSeries. When adding multiple scenes (Step 2), add `<TransitionSeries.Transition>` elements with `fade()` between each sequence at 1-1.5 seconds (30-45 frames at 30fps). Define `PADDING_FRAMES` (silence after voiceover ends) and ensure it is >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer. Load [./rules/transitions.md](./rules/transitions.md) for the full transition pattern with code examples.
+The scaffold sets up a basic TransitionSeries. When adding multiple scenes (Step 2), add `<TransitionSeries.Transition>` elements with `fade()` between each sequence at 1-1.5 seconds (30-45 frames at 30fps). Define `PADDING_FRAMES` (silence after voiceover ends) and ensure it is >= `TRANSITION_DURATION` or voiceovers will overlap during transitions.
+
+**For TTS voiceover + b-roll compositions:** Audio stays inside `TransitionSeries.Sequence` — this is safe because TTS audio is generated separately and not duplicated across clips.
+
+**For talking-head / UGC content (real person speaking on camera):** Audio MUST be separated into its own layer. Use the two-layer pattern: video dissolves on one layer, audio straight cuts on a separate layer. Putting talking-head audio inside `TransitionSeries.Sequence` causes word doubling during dissolves. Load [./rules/talking-head-transitions.md](./rules/talking-head-transitions.md) for the full pattern.
+
+Load [./rules/transitions.md](./rules/transitions.md) for the TransitionSeries wiring pattern with code examples.
 
 ### Step 6: Captions
 All videos should have animated subtitles with word highlighting. Follow this sequence:
@@ -228,7 +248,12 @@ When needing to use sound effects, load the [./rules/sound-effects.md](./rules/s
 
 Read individual rule files for detailed explanations and code examples:
 
-- [rules/vertical-layout.md](rules/vertical-layout.md) - **CSS layout patterns for 9:16 video** — centered lists, grids, safe zones, section spacing. READ THIS BEFORE WRITING ANY SCENE.
+- [rules/vertical-layout.md](rules/vertical-layout.md) - **CSS layout patterns for 9:16 video** — centered lists, grids, safe zones, the 9-quadrant grid for overlay-heavy scenes. READ THIS BEFORE WRITING ANY SCENE.
+- [rules/overlay-variety.md](rules/overlay-variety.md) - **The cardinal rule against template reuse across scenes.** READ BEFORE BUILDING ANY SCENE AFTER THE FIRST.
+- [rules/overlay-techniques-catalog.md](rules/overlay-techniques-catalog.md) - **Catalog of 30+ visually distinct CSS overlay techniques** with implementation snippets. Use as a menu — never reuse a technique across scenes.
+- [rules/match-words-not-vocabulary.md](rules/match-words-not-vocabulary.md) - **Overlays must match the concept, not the literal last word.** Never put a random vocabulary word on screen as a hero element.
+- [rules/sizing-and-weight.md](rules/sizing-and-weight.md) - **When a scene "feels weak", double sizes and spread rows.** Element size ranges and spacing guidance.
+- [rules/scene-iteration-workflow.md](rules/scene-iteration-workflow.md) - **Per-scene review cycle.** Propose plan → wait for approval → build → ship to Studio → iterate. One scene at a time.
 - [rules/3d.md](rules/3d.md) - 3D content in Remotion using Three.js and React Three Fiber
 - [rules/animations.md](rules/animations.md) - Fundamental animation skills for Remotion
 - [rules/assets.md](rules/assets.md) - Importing images, videos, audio, and fonts into Remotion
@@ -253,6 +278,7 @@ Read individual rule files for detailed explanations and code examples:
 - [rules/text-animations.md](rules/text-animations.md) - Typography and text animation patterns for Remotion
 - [rules/timing.md](rules/timing.md) - Interpolation curves in Remotion - linear, easing, spring animations
 - [rules/transitions.md](rules/transitions.md) - Scene transition patterns for Remotion
+- [rules/talking-head-transitions.md](rules/talking-head-transitions.md) - **Professional dissolve transitions for talking-head/UGC content** — two-layer pattern (video dissolve + audio straight cut), asset organization, extended handles, Remotion implementation. READ THIS for any composition with real person speaking.
 - [rules/transparent-videos.md](rules/transparent-videos.md) - Rendering out a video with transparency
 - [rules/trimming.md](rules/trimming.md) - Trimming patterns for Remotion - cut the beginning or end of animations
 - [rules/videos.md](rules/videos.md) - Embedding videos in Remotion - trimming, volume, speed, looping, pitch

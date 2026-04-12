@@ -38,6 +38,16 @@ Remote URLs are also supported:
 By default, audio plays from the start, at full volume and full length.
 Multiple audio tracks can be layered by adding multiple `<Audio>` components.
 
+## Separating Audio from Video
+
+For talking-head or UGC content, always extract audio into standalone files and play them as a separate layer from the video. This is required for professional dissolve transitions — see [talking-head-transitions.md](./talking-head-transitions.md). Use ffmpeg to extract:
+
+```bash
+ffmpeg -y -i source.mp4 -vn -c:a libmp3lame -b:a 192k output.mp3
+```
+
+Play the muted video with `<OffthreadVideo muted />` and the audio with `<Audio />` in separate components. This gives independent control over video opacity (for dissolves) and audio volume (for straight cuts or crossfades) without one affecting the other.
+
 ## Trimming
 
 Use `trimBefore` and `trimAfter` to remove portions of the audio. Values are in frames.

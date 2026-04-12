@@ -97,6 +97,13 @@ const BRollScene: React.FC<{
         }}
       >
         {children}
+        {/* For lists/cards inside b-roll scenes, use the centered-block-left-aligned pattern:
+            <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 24 }}>
+                ...items...
+              </div>
+            </div>
+        */}
       </AbsoluteFill>
     </AbsoluteFill>
   );
