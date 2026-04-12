@@ -150,7 +150,13 @@ When coding scenes with b-roll, you MUST follow the compositing pattern in [./ru
 - All text/elements over b-roll MUST have dark semi-transparent card backgrounds (`backgroundColor: "rgba(10,10,10,0.7)"`) for readability
 
 ### Step 5: Transitions
-The scaffold sets up a basic TransitionSeries. When adding multiple scenes (Step 2), add `<TransitionSeries.Transition>` elements with `fade()` between each sequence at 1-1.5 seconds (30-45 frames at 30fps). Define `PADDING_FRAMES` (silence after voiceover ends) and ensure it is >= `TRANSITION_DURATION` or voiceovers will overlap during transitions. Audio stays inside `TransitionSeries.Sequence` — do not separate it into its own layer. Load [./rules/transitions.md](./rules/transitions.md) for the full transition pattern with code examples.
+The scaffold sets up a basic TransitionSeries. When adding multiple scenes (Step 2), add `<TransitionSeries.Transition>` elements with `fade()` between each sequence at 1-1.5 seconds (30-45 frames at 30fps). Define `PADDING_FRAMES` (silence after voiceover ends) and ensure it is >= `TRANSITION_DURATION` or voiceovers will overlap during transitions.
+
+**For TTS voiceover + b-roll compositions:** Audio stays inside `TransitionSeries.Sequence` — this is safe because TTS audio is generated separately and not duplicated across clips.
+
+**For talking-head / UGC content (real person speaking on camera):** Audio MUST be separated into its own layer. Use the two-layer pattern: video dissolves on one layer, audio straight cuts on a separate layer. Putting talking-head audio inside `TransitionSeries.Sequence` causes word doubling during dissolves. Load [./rules/talking-head-transitions.md](./rules/talking-head-transitions.md) for the full pattern.
+
+Load [./rules/transitions.md](./rules/transitions.md) for the TransitionSeries wiring pattern with code examples.
 
 ### Step 6: Captions
 All videos should have animated subtitles with word highlighting. Follow this sequence:
@@ -272,6 +278,7 @@ Read individual rule files for detailed explanations and code examples:
 - [rules/text-animations.md](rules/text-animations.md) - Typography and text animation patterns for Remotion
 - [rules/timing.md](rules/timing.md) - Interpolation curves in Remotion - linear, easing, spring animations
 - [rules/transitions.md](rules/transitions.md) - Scene transition patterns for Remotion
+- [rules/talking-head-transitions.md](rules/talking-head-transitions.md) - **Professional dissolve transitions for talking-head/UGC content** — two-layer pattern (video dissolve + audio straight cut), asset organization, extended handles, Remotion implementation. READ THIS for any composition with real person speaking.
 - [rules/transparent-videos.md](rules/transparent-videos.md) - Rendering out a video with transparency
 - [rules/trimming.md](rules/trimming.md) - Trimming patterns for Remotion - cut the beginning or end of animations
 - [rules/videos.md](rules/videos.md) - Embedding videos in Remotion - trimming, volume, speed, looping, pitch
