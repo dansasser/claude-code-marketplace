@@ -131,7 +131,7 @@ export const CenteredListScene: React.FC = () => {
         </h1>
       </div>
 
-      {/* 
+      {/*
         This is the key pattern:
         - The OUTER div uses flexbox to center the block horizontally
         - The INNER div uses alignItems: "flex-start" so items left-align
