@@ -5,13 +5,15 @@
     "email": "contact@dansasser.me",
     "url": "https://github.com/dansasser"
   },
-  "description": "Claude Code plugins for ollama integration, AI-assisted development, Python/Node.js CI/CD automation, and package quality assurance",
+  "metadata": {
+    "description": "Claude Code plugins for local models, development automation, video production, and package quality assurance."
+  },
   "plugins": [
     {
       "name": "ollama-agents",
       "source": "./plugins/claude-ollama-agents",
       "description": "Intelligent multi-agent system for delegating analysis, code review, and complex reasoning tasks to local ollama models. Saves 70%+ of Claude's context budget with automatic model selection and parallel processing.",
-      "version": "1.0.1",
+      "version": "1.1.0",
       "author": {
         "name": "Daniel T Sasser II",
         "email": "contact@dansasser.me",
@@ -76,7 +78,7 @@
       "name": "remotion-gorombo",
       "source": "./plugins/remotion-gorombo",
       "description": "AI video production pipeline using Remotion. 7 prompt templates for explainers, promos, dashboards, testimonials, and more. Includes voiceover (ElevenLabs), b-roll (Krea.ai), animated captions (Whisper), and YouTube upload.",
-      "version": "1.4.3",
+      "version": "1.5.1",
       "author": {
         "name": "Daniel T Sasser II",
         "email": "contact@dansasser.me",
@@ -84,6 +86,24 @@
       },
       "keywords": ["remotion", "video", "youtube", "shorts", "tiktok", "reels", "voiceover", "b-roll", "captions", "krea", "elevenlabs", "whisper"],
       "category": "content-creation"
+    },
+    {
+      "name": "xquik-x-data",
+      "source": "./plugins/xquik-x-data",
+      "description": "Use Xquik's API, OAuth-enabled MCP server, SDKs, and webhooks from Claude Code. Not affiliated with X Corp.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Xquik",
+        "url": "https://github.com/Xquik-dev/x-twitter-scraper"
+      },
+      "keywords": [
+        "xquik",
+        "x-data",
+        "mcp",
+        "api",
+        "webhooks"
+      ],
+      "category": "productivity"
     }
   ]
 }

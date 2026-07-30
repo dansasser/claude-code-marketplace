@@ -1,0 +1,19 @@
+{
+  "name": "xquik-x-data",
+  "version": "1.0.0",
+  "description": "Use Xquik's API, OAuth-enabled MCP server, SDKs, and webhooks from Claude Code. Not affiliated with X Corp.",
+  "author": {
+    "name": "Xquik",
+    "url": "https://github.com/Xquik-dev/x-twitter-scraper"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/Xquik-dev/x-twitter-scraper",
+  "homepage": "https://docs.xquik.com",
+  "keywords": [
+    "xquik",
+    "x-data",
+    "mcp",
+    "api",
+    "webhooks"
+  ]
+}

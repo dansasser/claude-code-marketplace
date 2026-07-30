@@ -16,7 +16,7 @@ Intelligent multi-agent system for delegating analysis, code review, and complex
 - 5 slash commands: /analyze, /review, /architect, /models, /deep-analyze
 - 3 specialized agents for ollama model orchestration
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 **Category:** Productivity
 **License:** MIT
 
@@ -111,11 +111,29 @@ AI video production pipeline using Remotion. Turns simple prompts into fully pro
 - `/remotion-gorombo:blog-promo [URL]` - Tease a blog post
 - `/remotion-gorombo:before-after [URL]` - Old way vs new way
 
-**Version:** 1.3.0
+**Version:** 1.5.1
 **Category:** Content Creation
 **License:** MIT
 
 [Full Documentation](./plugins/remotion-gorombo/README.md)
+
+---
+
+### xquik-x-data
+
+Xquik X data workflows for Claude Code through a skill and OAuth-enabled MCP configuration. Not affiliated with X Corp.
+
+**Features:**
+- Links to the Xquik OpenAPI contract, MCP manifest, docs, and SDK source
+- Automatically registers the bundled remote MCP server when the plugin is enabled
+- Uses `/mcp` only to complete Claude Code-managed OAuth
+- Keeps optional REST API key handling explicit and user controlled
+
+**Version:** 1.0.0
+**Category:** Productivity
+**License:** MIT
+
+[Full Documentation](./plugins/xquik-x-data/README.md)
 
 ---
 

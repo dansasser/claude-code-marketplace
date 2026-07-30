@@ -1,12 +1,12 @@
 # Contributing to Dan Sasser's Claude Code Marketplace
 
-First off, thank you for considering contributing\! This is my personal collection of plugins, and I appreciate any help, whether it's a bug report, a new feature idea, or a code contribution.
+First off, thank you for considering contributing! This is my personal collection of plugins, and I appreciate any help, whether it's a bug report, a new feature idea, or a code contribution.
 
 ## How You Can Contribute
 
-  * [suspicious link removed]
-  * [suspicious link removed]
-  * [suspicious link removed]
+* [Report bugs](#reporting-bugs)
+* [Suggest enhancements or new plugins](#suggesting-enhancements-or-new-plugins)
+* [Submit pull requests](#submitting-pull-requests)
 
 ### Reporting Bugs
 
@@ -22,7 +22,7 @@ When you create a bug report, please include:
 
 ### Suggesting Enhancements or New Plugins
 
-I'd love to hear your ideas\! The best way to share them is by [opening a new issue](https://github.com/dansasser/claude-code-marketplace/issues).
+I'd love to hear your ideas! The best way to share them is by [opening a new issue](https://github.com/dansasser/claude-code-marketplace/issues).
 
 Please provide:
 
@@ -41,4 +41,4 @@ If you're ready to contribute code to fix a bug or add a new feature, here's the
 5.  **Open a Pull Request** (PR) from your fork to my `main` branch.
 6.  **Describe your changes** in the PR and link to any relevant issues.
 
-I'll review your PR as soon as I can. Thank you for helping me build this collection\!
+I'll review your PR as soon as I can. Thank you for helping me build this collection!
