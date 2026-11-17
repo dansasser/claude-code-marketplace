@@ -4,7 +4,7 @@
   "description": "Automated PR preparation with local CI validation, smart error recovery, and Mermaid diagram generation. Takes any branch state to published package.",
   "author": {
     "name": "Daniel T Sasser II",
-    "email": "contact@dansasser.me",
+    "email": "contact@gorombo.com",
     "url": "https://github.com/dansasser"
   },
   "homepage": "https://github.com/dansasser/claude-code-marketplace/tree/main/plugins/pr-prep",
