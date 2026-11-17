@@ -4,7 +4,7 @@
   "description": "AI video production pipeline using Remotion. Generate promotional videos, explainers, data dashboards, testimonials, and more from simple prompts. Includes voiceover (ElevenLabs), b-roll (Krea.ai), animated captions (Whisper), and YouTube upload.",
   "author": {
     "name": "Daniel T Sasser II",
-    "email": "contact@dansasser.me",
+    "email": "contact@gorombo.com",
     "url": "https://github.com/dansasser"
   },
   "homepage": "https://github.com/dansasser/claude-code-marketplace/tree/main/plugins/remotion-gorombo",

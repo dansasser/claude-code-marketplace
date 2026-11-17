@@ -245,7 +245,7 @@ Contributions are welcome! To add a plugin to this marketplace:
 ## Support
 
 - **Issues:** [GitHub Issues](https://github.com/dansasser/claude-code-marketplace/issues)
-- **Contact:** contact@dansasser.me
+- **Contact:** contact@gorombo.com
 - **Website:** [dansasser.me](https://dansasser.me)
 
 ## License

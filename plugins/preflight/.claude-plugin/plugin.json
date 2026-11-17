@@ -4,7 +4,7 @@
   "description": "Multi-agent CI/CD pipeline ensuring Python packages pass cross-platform, multi-version, and quality gates before shipping to GitHub or PyPI.",
   "author": {
     "name": "Daniel T Sasser II",
-    "email": "contact@dansasser.me",
+    "email": "contact@gorombo.com",
     "url": "https://github.com/dansasser"
   },
   "homepage": "https://github.com/dansasser/claude-code-marketplace/tree/main/plugins/preflight",
